@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using Ticketing.Application.Model.DTOs;
 using Ticketing.Infrastructure.DTOs;
 
 namespace TicketingSystem.Middleware;

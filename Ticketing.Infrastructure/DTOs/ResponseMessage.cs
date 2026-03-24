@@ -1,7 +1,8 @@
 using System.Runtime.CompilerServices;
+using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.Extensions;
 
-namespace Ticketing.Infrastructure.DTOs
+namespace Ticketing.Application.Model.DTOs
 {
     public class MessageStatus
     {

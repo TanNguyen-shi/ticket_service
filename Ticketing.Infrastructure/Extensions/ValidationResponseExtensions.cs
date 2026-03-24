@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Ticketing.Application.Model.DTOs;
 using Ticketing.Infrastructure.DTOs;
 
 namespace Ticketing.Infrastructure.Extensions;

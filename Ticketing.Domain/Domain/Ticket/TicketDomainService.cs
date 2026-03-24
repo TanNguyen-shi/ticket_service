@@ -1,3 +1,4 @@
+using Ticketing.Application.Model.DTOs;
 using Ticketing.Domain.Domain.Ticket.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.Ticket.Request;

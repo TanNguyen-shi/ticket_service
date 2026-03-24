@@ -1,3 +1,4 @@
+using Ticketing.Application.Model.DTOs;
 using Ticketing.Application.UseCases.TicketOrder.Interfaces;
 using Ticketing.Domain.Domain.TicketOrder.Interfaces;
 using Ticketing.Infrastructure.DTOs;

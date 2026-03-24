@@ -11,3 +11,16 @@
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.pdb
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/ref/Ticketing.Infrastructure.dll
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.sourcelink.json
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/bin/Debug/net8.0/Ticketing.Infrastructure.deps.json
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/bin/Debug/net8.0/Ticketing.Infrastructure.dll
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/bin/Debug/net8.0/Ticketing.Infrastructure.pdb
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.csproj.AssemblyReference.cache
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.AssemblyInfoInputs.cache
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.AssemblyInfo.cs
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.csproj.CoreCompileInputs.cache
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.sourcelink.json
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.dll
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/refint/Ticketing.Infrastructure.dll
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.pdb
+/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/ref/Ticketing.Infrastructure.dll

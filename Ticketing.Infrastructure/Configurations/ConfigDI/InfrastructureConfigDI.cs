@@ -17,6 +17,8 @@ using Ticketing.Infrastructure.Repositories.Ticket;
 using Ticketing.Infrastructure.Repositories.TicketOrder;
 using Ticketing.Infrastructure.Repositories.TicketOrderItem;
 using Ticketing.Infrastructure.Repositories.Ticketing;
+using Ticketing.Infrastructure.Repositories.SysAdmin;
+using Ticketing.Infrastructure.Repositories.SysUserRole;
 
 namespace Ticketing.Infrastructure.Configurations.ConfigDI;
 
@@ -63,10 +65,17 @@ public static class InfrastructureConfigDi
         services.AddScoped<ITicketRepository, TicketRepository>();
         services.AddScoped<ITicketingUnitOfWork, TicketingUnitOfWork>();
 
+        //System (shared unit of work)
+        services.AddScoped<ISysRoleRepository, SysRoleRepository>();
+        services.AddScoped<ISysUserRepository, SysUserRepository>();
+        services.AddScoped<ISysUserRoleRepository, SysUserRoleRepository>();
+        services.AddScoped<ISysAdminUnitOfWork, SysAdminUnitOfWork>();
+
         services.AddScoped<IJWTTokenService, JwtTokenService>();
 
         //Add DI UserHelper
         services.AddScoped<IUserHelper, UserHelper>();
+        services.AddScoped<IPasswordHelper, PasswordHelper>();
 
 
         return services;

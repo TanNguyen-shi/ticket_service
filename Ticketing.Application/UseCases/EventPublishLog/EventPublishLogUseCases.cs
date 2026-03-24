@@ -1,3 +1,4 @@
+using Ticketing.Application.Model.DTOs;
 using Ticketing.Application.UseCases.EventPublishLog.Interfaces;
 using Ticketing.Domain.Domain.EventPublishLog.Interfaces;
 using Ticketing.Infrastructure.DTOs;

@@ -20,8 +20,14 @@ using Ticketing.Application.UseCases.TicketOrder;
 using Ticketing.Application.UseCases.TicketOrder.Interfaces;
 using Ticketing.Application.UseCases.TicketOrderItem;
 using Ticketing.Application.UseCases.TicketOrderItem.Interfaces;
-using Ticketing.Domain.Domain.Auth;
-using Ticketing.Domain.Domain.Auth.Interfaces;
+using Ticketing.Application.UseCases.SysRole;
+using Ticketing.Application.UseCases.SysRole.Interfaces;
+using Ticketing.Application.UseCases.SysUser;
+using Ticketing.Application.UseCases.SysUser.Interfaces;
+using Ticketing.Application.UseCases.SysUserRole;
+using Ticketing.Application.UseCases.SysUserRole.Interfaces;
+using Ticketing.Application.UseCases.Auth;
+using Ticketing.Application.UseCases.Auth.Interfaces;
 
 namespace Ticketing.Application.ConfigDI;
 
@@ -41,7 +47,10 @@ public static class UseCaseConfigureDI
         services.AddScoped<ITicketOrderUseCases, TicketOrderUseCases>();
         services.AddScoped<ITicketOrderItemUseCases, TicketOrderItemUseCases>();
         services.AddScoped<ITicketUseCases, TicketUseCases>();
-        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ISysRoleUseCases, SysRoleUseCases>();
+        services.AddScoped<ISysUserUseCases, SysUserUseCases>();
+        services.AddScoped<ISysUserRoleUseCases, SysUserRoleUseCases>();
+        services.AddScoped<IAuthUseCases, AuthUseCases>();
 
         return services;
     }

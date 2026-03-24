@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Ticketing.Application.Model.DTOs;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.Extensions;
 using Ticketing.Infrastructure.Helpers;

@@ -22,6 +22,12 @@ using Ticketing.Domain.Domain.TicketOrder;
 using Ticketing.Domain.Domain.TicketOrder.Interfaces;
 using Ticketing.Domain.Domain.TicketOrderItem;
 using Ticketing.Domain.Domain.TicketOrderItem.Interfaces;
+using Ticketing.Domain.Domain.SysRole;
+using Ticketing.Domain.Domain.SysRole.Interfaces;
+using Ticketing.Domain.Domain.SysUser;
+using Ticketing.Domain.Domain.SysUser.Interfaces;
+using Ticketing.Domain.Domain.SysUserRole;
+using Ticketing.Domain.Domain.SysUserRole.Interfaces;
 
 namespace Ticketing.Domain.ConfigDI;
 
@@ -41,6 +47,9 @@ public static class DomainConfigDI
         services.AddScoped<ITicketOrderDomainService, TicketOrderDomainService>();
         services.AddScoped<ITicketOrderItemDomainService, TicketOrderItemDomainService>();
         services.AddScoped<ITicketDomainService, TicketDomainService>();
+        services.AddScoped<ISysRoleDomainService, SysRoleDomainService>();
+        services.AddScoped<ISysUserDomainService, SysUserDomainService>();
+        services.AddScoped<ISysUserRoleDomainService, SysUserRoleDomainService>();
         services.AddScoped<IAuthService, AuthService>();
 
         return services;

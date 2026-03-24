@@ -16,4 +16,3 @@ public class VenueSeatRepository(
     protected override string Schema => "ticketing";
     protected override string TableName => "venue_seat";
 }
-

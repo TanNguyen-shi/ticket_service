@@ -1,3 +1,4 @@
+using Ticketing.Application.Model.DTOs;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.EventPublishLog.Request;
 using Ticketing.Infrastructure.DTOs.EventPublishLog.Response;
@@ -9,6 +10,7 @@ public interface IEventPublishLogDomainService
 {
     Task<ResponseMessage<int>> InsertAsync(EventPublishLogEntity entity, CancellationToken cancellationToken = default);
 
+    
     Task<ResponseMessage<bool>> UpdateAsync(EventPublishLogEntity entity, CancellationToken cancellationToken = default);
 
     Task<ResponseMessage<bool>> DeleteAsync(EventPublishLogEntity entity, CancellationToken cancellationToken = default);

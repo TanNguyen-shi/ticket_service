@@ -1,37 +1,56 @@
+using Ticketing.Application.Model.DTOs;
 using Ticketing.Domain.Domain.Auth.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.Auth.Request;
 using Ticketing.Infrastructure.DTOs.Auth.Response;
-using Ticketing.Infrastructure.JWT;
+using Ticketing.Infrastructure.DTOs.SysUser.Request;
+using Ticketing.Infrastructure.DTOs.SysUser.Response;
+using Ticketing.Infrastructure.Helpers.Interfaces;
 using Ticketing.Infrastructure.JWT.Interfaces;
 using Ticketing.Infrastructure.JWT.Model;
+using Ticketing.Infrastructure.Repositories.SysAdmin;
 
 namespace Ticketing.Domain.Domain.Auth;
 
-public class AuthService(IJWTTokenService jwtTokenService) : IAuthService
+public class AuthService(
+    IJWTTokenService jwtTokenService,
+    ISysAdminUnitOfWork sysAdminUnitOfWork,
+    IPasswordHelper passwordHelper
+) : IAuthService
 {
-    public async Task<ResponseMessage<AuthLoginDto>> Login(AuthLoginRequest request)
+    public async Task<ResponseMessage<AuthLoginDto>> Login(AuthLoginRequest request, CancellationToken cancellationToken = default)
     {
-        var response = new AuthLoginDto();
         try
         {
-            var user = new JwtUserInfo();
-            if (request.username == "tan.nguyenthien" && request.password == "tan@313214")
+            var systemUser = await sysAdminUnitOfWork.SysUser.GetByUserAsync<SysUserDto, SysUserGetByUserRequest>(new SysUserGetByUserRequest()
             {
-                //Todo : Giả lập dữ liệu -> Sẽ bổ sung logic kiểm tra username/password sau 
-                user = new JwtUserInfo
-                {
-                    user_id = 1,
-                    username = "tan.nguyenthien",
-                    full_name = "System Admin",
-                    user_type = "admin",
-                    roles = new List<string> { "SUPER_ADMIN" }
-                };
-            }
+                username = request.username
+            }, cancellationToken);
+            if (systemUser is null)
+                return new ResponseMessage<AuthLoginDto>().MessageWarning("Tên đăng nhập hoặc mật khẩu không đúng");
+
+            var hashPassword = passwordHelper.HashPassword(request.password);
+            
+            
+            if (!passwordHelper.VerifyPassword(request.password, systemUser.password_hash))
+                return new ResponseMessage<AuthLoginDto>().MessageWarning("Mật khẩu không chính xác, vui lòng thử lại sau.");
+
+            var role = string.Equals(systemUser.user_type, "admin", StringComparison.OrdinalIgnoreCase)
+                ? "SUPER_ADMIN"
+                : "USER";
+
+            var user = new JwtUserInfo
+            {
+                user_id = systemUser.user_id,
+                username = systemUser.username,
+                full_name = systemUser.full_name,
+                user_type = systemUser.user_type,
+                roles = new List<string> { role }
+            };
 
             var accessToken = jwtTokenService.GenerateAccessToken(user);
 
-            response = new AuthLoginDto
+            var response = new AuthLoginDto
             {
                 access_token = accessToken,
                 token_type = "Bearer",
@@ -42,11 +61,12 @@ public class AuthService(IJWTTokenService jwtTokenService) : IAuthService
                     username = user.username,
                     full_name = user.full_name,
                     user_type = user.user_type,
+                    status = systemUser.status,
                     roles = user.roles
                 }
             };
 
-            return new ResponseMessage<AuthLoginDto>().MessageSuccess(response);
+            return new ResponseMessage<AuthLoginDto>().MessageSuccess(response, "Đăng nhập thành công");
         }
         catch (Exception e)
         {

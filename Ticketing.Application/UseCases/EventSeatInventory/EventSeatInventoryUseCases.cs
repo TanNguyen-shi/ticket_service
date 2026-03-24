@@ -1,3 +1,4 @@
+using Ticketing.Application.Model.DTOs;
 using Ticketing.Application.UseCases.EventSeatInventory.Interfaces;
 using Ticketing.Domain.Domain.EventSeatInventory.Interfaces;
 using Ticketing.Infrastructure.DTOs;

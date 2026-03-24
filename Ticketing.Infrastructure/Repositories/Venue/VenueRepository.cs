@@ -17,11 +17,10 @@ public class VenueRepository(IDapperProcedureHelper dapper, DapperContextAccesso
 
     public async Task<IEnumerable<VenueEntity>> GetByStatusAsync(int status, CancellationToken cancellationToken = default)
     {
-        var spName = $"{Schema}.sp_event_get_by_status";
         var parameters = new object[]
         {
             "status", status
         };
-        return await _dapper.GetAllAsync<VenueEntity>(Connection, spName, parameters, 30, Transaction, cancellationToken);
+        return await _dapper.GetAllAsync<VenueEntity>(Connection, GetSpName("get_by_status"), parameters, 30, Transaction, cancellationToken);
     }
 }

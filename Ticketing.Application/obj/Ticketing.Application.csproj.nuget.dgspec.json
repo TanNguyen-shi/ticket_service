@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Application/Ticketing.Application.csproj": {}
+    "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Application/Ticketing.Application.csproj": {}
   },
   "projects": {
-    "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Application/Ticketing.Application.csproj": {
+    "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Application/Ticketing.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Application/Ticketing.Application.csproj",
+        "projectUniqueName": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Application/Ticketing.Application.csproj",
         "projectName": "Ticketing.Application",
-        "projectPath": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Application/Ticketing.Application.csproj",
+        "projectPath": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Application/Ticketing.Application.csproj",
         "packagesPath": "/Users/tanit/.nuget/packages/",
-        "outputPath": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Application/obj/",
+        "outputPath": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Application/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/tanit/.nuget/NuGet/NuGet.Config"
@@ -26,11 +26,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Domain/Ticketing.Domain.csproj": {
-                "projectPath": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Domain/Ticketing.Domain.csproj"
+              "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Domain/Ticketing.Domain.csproj": {
+                "projectPath": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Domain/Ticketing.Domain.csproj"
               },
-              "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj": {
-                "projectPath": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj"
+              "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj": {
+                "projectPath": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj"
               }
             }
           }
@@ -91,14 +91,14 @@
         }
       }
     },
-    "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Domain/Ticketing.Domain.csproj": {
+    "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Domain/Ticketing.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Domain/Ticketing.Domain.csproj",
+        "projectUniqueName": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Domain/Ticketing.Domain.csproj",
         "projectName": "Ticketing.Domain",
-        "projectPath": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Domain/Ticketing.Domain.csproj",
+        "projectPath": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Domain/Ticketing.Domain.csproj",
         "packagesPath": "/Users/tanit/.nuget/packages/",
-        "outputPath": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Domain/obj/",
+        "outputPath": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/tanit/.nuget/NuGet/NuGet.Config"
@@ -113,8 +113,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj": {
-                "projectPath": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj"
+              "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj": {
+                "projectPath": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj"
               }
             }
           }
@@ -175,14 +175,14 @@
         }
       }
     },
-    "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj": {
+    "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj",
+        "projectUniqueName": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj",
         "projectName": "Ticketing.Infrastructure",
-        "projectPath": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj",
+        "projectPath": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/Ticketing.Infrastructure.csproj",
         "packagesPath": "/Users/tanit/.nuget/packages/",
-        "outputPath": "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/obj/",
+        "outputPath": "/Users/tanit/UIT/HK3/Ticketing/TicketingSystem/Ticketing.Infrastructure/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/tanit/.nuget/NuGet/NuGet.Config"
@@ -222,17 +222,13 @@
               "target": "Package",
               "version": "[8.0.25, )"
             },
-            "Microsoft.AspNetCore.Mvc.Core": {
-              "target": "Package",
-              "version": "[2.3.9, )"
-            },
             "Microsoft.Extensions.Configuration": {
               "target": "Package",
-              "version": "[10.0.0, )"
+              "version": "[8.0.0, )"
             },
             "Microsoft.Extensions.Configuration.Abstractions": {
               "target": "Package",
-              "version": "[10.0.5, )"
+              "version": "[8.0.0, )"
             },
             "Microsoft.Extensions.Configuration.EnvironmentVariables": {
               "target": "Package",
@@ -248,7 +244,7 @@
             },
             "Microsoft.Extensions.DependencyInjection.Abstractions": {
               "target": "Package",
-              "version": "[10.0.5, )"
+              "version": "[8.0.0, )"
             },
             "Microsoft.Extensions.Options.ConfigurationExtensions": {
               "target": "Package",
