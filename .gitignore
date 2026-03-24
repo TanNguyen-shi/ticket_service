@@ -1,0 +1,54 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+# IDE folders
+.vs/
+.idea/
+
+# NuGet and package caches
+*.nupkg
+*.snupkg
+packages/
+
+# Logs
+*.log
+logs/
+
+# Environment and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Test / coverage outputs
+TestResults/
+**/TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Tooling
+_ReSharper*/
+*.ReSharper
+
+# Backup/temp files
+*.tmp
+*.temp
+*.bak
+*~
+
