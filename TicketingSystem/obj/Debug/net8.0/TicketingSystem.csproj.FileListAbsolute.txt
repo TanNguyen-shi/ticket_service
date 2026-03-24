@@ -74,3 +74,4 @@
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/TicketingSystem/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/TicketingSystem/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/TicketingSystem/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/TicketingSystem/obj/Debug/net8.0/TicketingSystem.sourcelink.json

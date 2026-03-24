@@ -10,3 +10,4 @@
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/refint/Ticketing.Infrastructure.dll
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.pdb
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/ref/Ticketing.Infrastructure.dll
+/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Infrastructure/obj/Debug/net8.0/Ticketing.Infrastructure.sourcelink.json

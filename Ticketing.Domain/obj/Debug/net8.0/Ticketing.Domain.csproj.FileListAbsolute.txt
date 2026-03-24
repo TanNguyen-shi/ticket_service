@@ -13,3 +13,4 @@
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Domain/obj/Debug/net8.0/refint/Ticketing.Domain.dll
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Domain/obj/Debug/net8.0/Ticketing.Domain.pdb
 /Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Domain/obj/Debug/net8.0/ref/Ticketing.Domain.dll
+/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/Ticketing.Domain/obj/Debug/net8.0/Ticketing.Domain.sourcelink.json
