@@ -4,24 +4,24 @@ namespace Ticketing.Infrastructure.DTOs.Auth.Request;
 
 public class AuthLoginRequest : IValidatableObject
 {
-    [Required(ErrorMessage = "username is required")]
-    [StringLength(50, ErrorMessage = "username must be less than or equal to 50 characters")]
+    [Required(ErrorMessage = "username là bắt buộc")]
+    [StringLength(50, ErrorMessage = "username phải có tối đa 50 ký tự")]
     public string username { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "password is required")]
-    [StringLength(200, ErrorMessage = "password must be less than or equal to 200 characters")]
+    [Required(ErrorMessage = "password là bắt buộc")]
+    [StringLength(200, ErrorMessage = "password phải có tối đa 200 ký tự")]
     public string password { get; set; } = string.Empty;
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (string.IsNullOrWhiteSpace(username))
         {
-            yield return new ValidationResult("username must not be empty", new[] { nameof(username) });
+            yield return new ValidationResult("username không được để trống", new[] { nameof(username) });
         }
 
         if (string.IsNullOrWhiteSpace(password))
         {
-            yield return new ValidationResult("password must not be empty", new[] { nameof(password) });
+            yield return new ValidationResult("password không được để trống", new[] { nameof(password) });
         }
     }
 }

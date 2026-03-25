@@ -16,7 +16,7 @@ public class AuthUseCases(
         var result = new ResponseMessage<AuthLoginDto>();
         try
         {
-            return await authService.Login(request);
+            return await authService.Login(request, cancellationToken);
         }
         catch (Exception e)
         {

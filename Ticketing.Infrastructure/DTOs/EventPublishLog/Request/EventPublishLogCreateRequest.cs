@@ -4,21 +4,21 @@ namespace Ticketing.Infrastructure.DTOs.EventPublishLog.Request;
 
 public class EventPublishLogCreateRequest : IValidatableObject
 {
-    [Required(ErrorMessage = "event_id is required")]
-    [Range(1, long.MaxValue, ErrorMessage = "event_id must be greater than 0")]
+    [Required(ErrorMessage = "event_id là bắt buộc")]
+    [Range(1, long.MaxValue, ErrorMessage = "event_id phải lớn hơn 0")]
     public long event_id { get; set; }
 
-    [Required(ErrorMessage = "action is required")]
-    [StringLength(50, ErrorMessage = "action must be less than or equal to 50 characters")]
+    [Required(ErrorMessage = "action là bắt buộc")]
+    [StringLength(50, ErrorMessage = "action phải có tối đa 50 ký tự")]
     public string action { get; set; } = string.Empty;
 
-    [StringLength(50, ErrorMessage = "old_status must be less than or equal to 50 characters")]
+    [StringLength(50, ErrorMessage = "old_status phải có tối đa 50 ký tự")]
     public string? old_status { get; set; }
 
-    [StringLength(50, ErrorMessage = "new_status must be less than or equal to 50 characters")]
+    [StringLength(50, ErrorMessage = "new_status phải có tối đa 50 ký tự")]
     public string? new_status { get; set; }
 
-    [StringLength(500, ErrorMessage = "note must be less than or equal to 500 characters")]
+    [StringLength(500, ErrorMessage = "note phải có tối đa 500 ký tự")]
     public string? note { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -26,7 +26,7 @@ public class EventPublishLogCreateRequest : IValidatableObject
         if (string.IsNullOrWhiteSpace(action))
         {
             yield return new ValidationResult(
-                "action must not be empty",
+                "action không được để trống",
                 new[] { nameof(action) });
         }
     }
