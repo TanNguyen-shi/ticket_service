@@ -26,6 +26,19 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddUseCaseService(builder.Configuration);
 builder.Services.AddDomainServices(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
+
+const string LocalFrontendCorsPolicy = "LocalFrontendPolicy";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(LocalFrontendCorsPolicy, policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000", "http://127.0.0.1:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -127,6 +140,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(LocalFrontendCorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();

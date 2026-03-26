@@ -3,7 +3,7 @@ using Ticketing.Application.UseCases.SysRole.Interfaces;
 using Ticketing.Infrastructure.DTOs.SysRole.Request;
 using Ticketing.Infrastructure.Helpers.Interfaces;
 
-namespace TicketingSystem.Controllers.Admin.Event;
+namespace TicketingSystem.Controllers.Admin.SystemUser;
 
 [Route("api/admin/event/sys-role")]
 public class SysRoleController(ISysRoleUseCases sysRoleUseCases, IUserHelper user) : BaseApiController
@@ -73,4 +73,3 @@ public class SysRoleController(ISysRoleUseCases sysRoleUseCases, IUserHelper use
         return Ok(result);
     }
 }
-
