@@ -43,7 +43,7 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -51,6 +51,8 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
             return new ResponseMessage<int>().MessageError(e.Message);
         }
     }
+
+    
 
     public async Task<ResponseMessage<bool>> UpdateAsync(EventEntity entity, CancellationToken cancellationToken = default)
     {
@@ -83,7 +85,7 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -103,7 +105,7 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
             var result = await _repository.DeleteAsync(new
             {
                 event_id = entity.event_id,
-                updated_by = entity.updated_by
+                updated_by =  entity.updated_by
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
@@ -111,7 +113,7 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -130,9 +132,9 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<EventDetailDto?>().MessageWarning("Không tìm thấy dữ liệu");
+                return new ResponseMessage<EventDetailDto?>().MessageWarning("Không tìm thấy thông tin sự kiện");
 
-            return new ResponseMessage<EventDetailDto?>().MessageSuccess(result, "Thành công");
+            return new ResponseMessage<EventDetailDto?>().MessageSuccess(result, "Lấy chi tiết sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -153,7 +155,7 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
                 venue_id = request.venue_id
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<EventListDto>>().MessageSuccess(result ?? [], "Thành công");
+            return new ResponseMessage<IEnumerable<EventListDto>>().MessageSuccess(result ?? [], "Lấy danh sách sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -161,4 +163,3 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
         }
     }
 }
-

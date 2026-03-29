@@ -35,11 +35,11 @@ public class VenueDomainService(IVenueUnitOfWork unitOfWork)
             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
-                throw new Exception("Thêm mới thất bại");
+                throw new Exception("Thêm địa điểm thất bại");
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm địa điểm thành công");
         }
         catch (Exception e)
         {
@@ -69,11 +69,11 @@ public class VenueDomainService(IVenueUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Cập nhật thất bại");
+                throw new Exception("Cập nhật địa điểm thất bại");
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật địa điểm thành công");
         }
         catch (Exception e)
         {
@@ -97,11 +97,11 @@ public class VenueDomainService(IVenueUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Xóa dữ liệu thất bại");
+                throw new Exception("Xóa địa điểm thất bại");
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa địa điểm thành công");
         }
         catch (Exception e)
         {
@@ -120,9 +120,9 @@ public class VenueDomainService(IVenueUnitOfWork unitOfWork)
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<VenueDetailDto?>().MessageWarning("Không tìm thấy dữ liệu");
+                return new ResponseMessage<VenueDetailDto?>().MessageWarning("Không tìm thấy thông tin địa điểm");
 
-            return new ResponseMessage<VenueDetailDto?>().MessageSuccess(result, "Thành công");
+            return new ResponseMessage<VenueDetailDto?>().MessageSuccess(result, "Lấy chi tiết địa điểm thành công");
         }
         catch (Exception e)
         {
@@ -143,7 +143,23 @@ public class VenueDomainService(IVenueUnitOfWork unitOfWork)
                 city = request.city
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<VenueListDto>>().MessageSuccess(result ?? [], "Thành công");
+            return new ResponseMessage<IEnumerable<VenueListDto>>().MessageSuccess(result ?? [], "Lấy danh sách địa điểm thành công");
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<IEnumerable<VenueListDto>>().MessageError(e.Message);
+        }
+    }
+    
+    public async Task<ResponseMessage<IEnumerable<VenueListDto>>> GetAll(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await _repository.GetAllAsync<VenueListDto>(new
+            {
+            }, cancellationToken);
+
+            return new ResponseMessage<IEnumerable<VenueListDto>>().MessageSuccess(result ?? [], "Lấy toàn bộ địa điểm thành công");
         }
         catch (Exception e)
         {

@@ -20,7 +20,9 @@ public static class ParameterExtensions
         return PropertyCache.GetOrAdd(type, t => 
         {
             var properties = t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.GetMethod is { IsPublic: true } && p.GetIndexParameters().Length == 0) // Chỉ lấy property có public getter thật sự
+                .Where(p => p.GetMethod is { IsPublic: true }
+                            && p.GetIndexParameters().Length == 0
+                            && !Attribute.IsDefined(p, typeof(DbParamIgnoreAttribute))) // Chỉ lấy property có public getter thật sự
                 .OrderBy(p => p.Name, StringComparer.Ordinal) // Cố định thứ tự theo Ordinal để tránh culture differences
                 .ToArray();
             
@@ -29,6 +31,25 @@ public static class ParameterExtensions
             
             return new PropertyDescriptor(properties, names);
         });
+    }
+
+    private static DateTime ToDbTimestamp(DateTime value)
+    {
+        return DateTime.SpecifyKind(value, DateTimeKind.Unspecified);
+    }
+
+    private static object? NormalizeParameterValue(object? value)
+    {
+        if (value is null || value == DBNull.Value)
+            return value;
+
+        if (value is Enum enumValue)
+            return Convert.ToInt32(enumValue);
+
+        if (value is DateTime dateTime)
+            return ToDbTimestamp(dateTime);
+
+        return value;
     }
     
     
@@ -44,7 +65,8 @@ public static class ParameterExtensions
             foreach (var kvp in dict)
             {
                 list.Add(kvp.Key);
-                list.Add(kvp.Value ?? DBNull.Value);
+                var normalizedValue = NormalizeParameterValue(kvp.Value);
+                list.Add(normalizedValue ?? DBNull.Value);
             }
         }
         else
@@ -53,7 +75,7 @@ public static class ParameterExtensions
             foreach (var prop in props)
             {
                 var name = prop.Name;
-                var value = prop.GetValue(obj, null) ?? DBNull.Value;
+                var value = NormalizeParameterValue(prop.GetValue(obj, null)) ?? DBNull.Value;
 
                 list.Add(name);
                 list.Add(value);
@@ -75,7 +97,8 @@ public static class ParameterExtensions
                 foreach (var kv in dict)
                 {
                     list.Add(kv.Key);
-                    list.Add(kv.Value ?? DBNull.Value);
+                    var normalizedValue = NormalizeParameterValue(kv.Value);
+                    list.Add(normalizedValue ?? DBNull.Value);
                 }
                 return list.ToArray();
             }
@@ -95,16 +118,12 @@ public static class ParameterExtensions
             // Luôn thêm cả property để đồng nhất với compiled mapper
             for (int i = 0; i < descriptor.Properties.Length; i++)
             {
-                
-                if (Attribute.IsDefined(descriptor.Properties[i], typeof(DbParamIgnoreAttribute)))
-                    continue;
-                
                 var prop = descriptor.Properties[i];
                 var propName = descriptor.Names[i]; // Dùng cached name thay vì prop.Name
                 
                 var value = prop.GetValue(obj);
-                if (value is Enum) 
-                    value = Convert.ToInt32(value);
+                value = NormalizeParameterValue(value);
+
                 paramList.Add(propName);
                 
                 // Xử lý null đúng cách: chỉ convert thành DBNull.Value nếu là reference type hoặc nullable
@@ -166,6 +185,8 @@ public static class ParameterExtensions
             
             var expressions = new List<Expression>();
             var resultVariable = Expression.Variable(typeof(object[]), "result");
+            var normalizeMethod = typeof(ParameterExtensions)
+                .GetMethod(nameof(NormalizeParameterValue), BindingFlags.NonPublic | BindingFlags.Static)!;
             
             // Create result array with exact size (property count * 2)
             var arraySize = Expression.Constant(descriptor.Properties.Length * 2);
@@ -191,7 +212,6 @@ public static class ParameterExtensions
                 else if (Nullable.GetUnderlyingType(prop.PropertyType) != null)
                 {
                     // Nullable<T>: tối ưu vi mô với HasValue check
-                    var underlyingType = Nullable.GetUnderlyingType(prop.PropertyType)!;
                     var hasValueProperty = prop.PropertyType.GetProperty("HasValue")!;
                     var valueProperty = prop.PropertyType.GetProperty("Value")!;
                     
@@ -213,6 +233,9 @@ public static class ParameterExtensions
                         Expression.Convert(propAccess, typeof(object))
                     );
                 }
+
+                // Đồng bộ normalize với ToParameterArray (enum + DateTime -> DB-safe value)
+                propValue = Expression.Call(normalizeMethod, propValue);
                 
                 // Add property name - dùng cached name thay vì Expression.Constant(prop.Name)
                 var nameIndex = Expression.Constant(i * 2);

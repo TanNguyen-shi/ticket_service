@@ -87,4 +87,12 @@ public class VenueController(IVenueUseCases venueUseCases, IUserHelper user) : B
             cancellationToken);
         return Ok(result);
     }
+
+    [HttpGet("getall")]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await venueUseCases.GetAllAsync(user.UserId,
+            cancellationToken);
+        return Ok(result);
+    }
 }

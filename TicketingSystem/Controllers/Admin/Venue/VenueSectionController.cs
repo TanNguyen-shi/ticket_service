@@ -87,4 +87,13 @@ public class VenueSectionController(IVenueSectionUseCases venueSectionUseCases, 
             cancellationToken);
         return Ok(result);
     }
+
+    [HttpGet("getall")]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await venueSectionUseCases.GetAllAsync(
+            user.UserId,
+            cancellationToken);
+        return Ok(result);
+    }
 }

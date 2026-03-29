@@ -40,7 +40,7 @@ public class EventSeatInventoryDomainService(IEventSeatInventoryUnitOfWork unitO
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm tồn kho ghế sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -75,7 +75,7 @@ public class EventSeatInventoryDomainService(IEventSeatInventoryUnitOfWork unitO
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật tồn kho ghế sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -102,7 +102,7 @@ public class EventSeatInventoryDomainService(IEventSeatInventoryUnitOfWork unitO
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa tồn kho ghế sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -123,9 +123,9 @@ public class EventSeatInventoryDomainService(IEventSeatInventoryUnitOfWork unitO
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<EventSeatInventoryDetailDto?>().MessageWarning("Không tìm thấy dữ liệu");
+                return new ResponseMessage<EventSeatInventoryDetailDto?>().MessageWarning("Không tìm thấy thông tin tồn kho ghế sự kiện");
 
-            return new ResponseMessage<EventSeatInventoryDetailDto?>().MessageSuccess(result, "Thành công");
+            return new ResponseMessage<EventSeatInventoryDetailDto?>().MessageSuccess(result, "Lấy chi tiết tồn kho ghế sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -149,7 +149,7 @@ public class EventSeatInventoryDomainService(IEventSeatInventoryUnitOfWork unitO
                 seat_status = request.seat_status
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<EventSeatInventoryListDto>>().MessageSuccess(result ?? [], "Thành công");
+            return new ResponseMessage<IEnumerable<EventSeatInventoryListDto>>().MessageSuccess(result ?? [], "Lấy danh sách tồn kho ghế sự kiện thành công");
         }
         catch (Exception e)
         {

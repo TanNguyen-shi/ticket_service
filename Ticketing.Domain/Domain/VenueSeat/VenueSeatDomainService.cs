@@ -55,7 +55,7 @@ public class VenueSeatDomainService(IVenueSeatUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm ghế thành công");
         }
         catch (Exception e)
         {
@@ -106,7 +106,7 @@ public class VenueSeatDomainService(IVenueSeatUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật ghế thành công");
         }
         catch (Exception e)
         {
@@ -134,7 +134,7 @@ public class VenueSeatDomainService(IVenueSeatUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa ghế thành công");
         }
         catch (Exception e)
         {
@@ -155,9 +155,9 @@ public class VenueSeatDomainService(IVenueSeatUnitOfWork unitOfWork)
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<VenueSeatDetailDto?>().MessageWarning("Không tìm thấy dữ liệu");
+                return new ResponseMessage<VenueSeatDetailDto?>().MessageWarning("Không tìm thấy thông tin ghế");
 
-            return new ResponseMessage<VenueSeatDetailDto?>().MessageSuccess(result, "Thành công");
+            return new ResponseMessage<VenueSeatDetailDto?>().MessageSuccess(result, "Lấy chi tiết ghế thành công");
         }
         catch (Exception e)
         {
@@ -182,7 +182,7 @@ public class VenueSeatDomainService(IVenueSeatUnitOfWork unitOfWork)
                 seat_type = request.seat_type
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<VenueSeatListDto>>().MessageSuccess(result ?? [], "Thành công");
+            return new ResponseMessage<IEnumerable<VenueSeatListDto>>().MessageSuccess(result ?? [], "Lấy danh sách ghế thành công");
         }
         catch (Exception e)
         {

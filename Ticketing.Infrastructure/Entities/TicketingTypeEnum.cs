@@ -16,5 +16,6 @@ public enum TicketingTypeEnum
     [Display(Name = "Vé")] Ticket = 10,
     [Display(Name = "Vai trò hệ thống")] SysRole = 11,
     [Display(Name = "Người dùng hệ thống")] SysUser = 12,
-    [Display(Name = "Phân quyền người dùng")] SysUserRole = 13
+    [Display(Name = "Phân quyền người dùng")] SysUserRole = 13,
+    [Display(Name = "Giá vé vùng sự kiện")] EventZonePrice = 14
 }

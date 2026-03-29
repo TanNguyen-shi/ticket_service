@@ -108,6 +108,53 @@ public class DapperProcedureHelper : IDapperProcedureHelper
                 conn, tran, store, parameters, timeout, cancellationToken));
     }
 
+    public async Task<string?> ExecStoreToStringAsync(
+        string store,
+        object[]? parameters = null,
+        int timeout = 30,
+        CancellationToken cancellationToken = default)
+    {
+        return await ExecStoreToStringAsync(null, store, parameters, timeout, null, cancellationToken);
+    }
+
+    public async Task<string?> ExecStoreToStringAsync(
+        NpgsqlConnection? db,
+        string store,
+        object[]? parameters = null,
+        int timeout = 30,
+        NpgsqlTransaction? dbTransaction = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await ExecuteDbAsync(
+            db,
+            dbTransaction,
+            cancellationToken,
+            async (conn, tran) =>
+            {
+                var cursorName = await CallFunctionForCursorAsync(
+                    conn,
+                    tran,
+                    store,
+                    parameters,
+                    timeout,
+                    cancellationToken);
+
+                if (string.IsNullOrWhiteSpace(cursorName))
+                    return null;
+
+                var sql = $@"FETCH ALL IN ""{cursorName}"";";
+
+                return await conn.QueryFirstOrDefaultAsync<string>(
+                    new CommandDefinition(
+                        sql,
+                        parameters: null,
+                        commandType: CommandType.Text,
+                        commandTimeout: timeout,
+                        transaction: tran,
+                        cancellationToken: cancellationToken));
+            });
+    }
+
     public T? Get<T>(string store, object[]? parameters = null, int timeout = 30)
     {
         return Get<T>(null, store, parameters, timeout, null);

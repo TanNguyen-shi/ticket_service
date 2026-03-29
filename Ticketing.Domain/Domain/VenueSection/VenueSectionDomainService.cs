@@ -51,7 +51,7 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm khu vực thành công");
         }
         catch (Exception e)
         {
@@ -97,7 +97,7 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật khu vực thành công");
         }
         catch (Exception e)
         {
@@ -125,7 +125,7 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa khu vực thành công");
         }
         catch (Exception e)
         {
@@ -146,9 +146,9 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<VenueSectionDetailDto?>().MessageWarning("Không tìm thấy dữ liệu");
+                return new ResponseMessage<VenueSectionDetailDto?>().MessageWarning("Không tìm thấy thông tin khu vực");
 
-            return new ResponseMessage<VenueSectionDetailDto?>().MessageSuccess(result, "Thành công");
+            return new ResponseMessage<VenueSectionDetailDto?>().MessageSuccess(result, "Lấy chi tiết khu vực thành công");
         }
         catch (Exception e)
         {
@@ -171,7 +171,23 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
                 status = request.status
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<VenueSectionListDto>>().MessageSuccess(result ?? [], "Thành công");
+            return new ResponseMessage<IEnumerable<VenueSectionListDto>>().MessageSuccess(result ?? [], "Lấy danh sách khu vực thành công");
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<IEnumerable<VenueSectionListDto>>().MessageError(e.Message);
+        }
+    }
+
+    public async Task<ResponseMessage<IEnumerable<VenueSectionListDto>>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await _repository.GetAllAsync<VenueSectionListDto>(new
+            {
+            }, cancellationToken);
+
+            return new ResponseMessage<IEnumerable<VenueSectionListDto>>().MessageSuccess(result ?? [], "Lấy toàn bộ khu vực thành công");
         }
         catch (Exception e)
         {
@@ -179,4 +195,3 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
         }
     }
 }
-

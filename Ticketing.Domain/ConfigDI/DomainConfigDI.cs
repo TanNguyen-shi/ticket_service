@@ -16,6 +16,8 @@ using Ticketing.Domain.Domain.EventSeatInventory;
 using Ticketing.Domain.Domain.EventSeatInventory.Interfaces;
 using Ticketing.Domain.Domain.EventZone;
 using Ticketing.Domain.Domain.EventZone.Interfaces;
+using Ticketing.Domain.Domain.EventZonePrice;
+using Ticketing.Domain.Domain.EventZonePrice.Interfaces;
 using Ticketing.Domain.Domain.Ticket;
 using Ticketing.Domain.Domain.Ticket.Interfaces;
 using Ticketing.Domain.Domain.TicketOrder;
@@ -44,6 +46,7 @@ public static class DomainConfigDI
         services.AddScoped<IEventPublishLogDomainService, EventPublishLogDomainService>();
         services.AddScoped<IEventSeatInventoryDomainService, EventSeatInventoryDomainService>();
         services.AddScoped<IEventZoneDomainService, EventZoneDomainService>();
+        services.AddScoped<IEventZonePriceDomainService, EventZonePriceDomainService>();
         services.AddScoped<ITicketOrderDomainService, TicketOrderDomainService>();
         services.AddScoped<ITicketOrderItemDomainService, TicketOrderItemDomainService>();
         services.AddScoped<ITicketDomainService, TicketDomainService>();

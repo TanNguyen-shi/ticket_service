@@ -40,7 +40,7 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
                 throw new Exception("Thêm mới vé thất bại");
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm vé thành công");
         }
         catch (Exception e)
         {
@@ -76,7 +76,7 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
                 throw new Exception("Cập nhật vé thất bại");
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật vé thành công");
         }
         catch (Exception e)
         {
@@ -97,7 +97,7 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
                 throw new Exception("Xóa vé thất bại");
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa vé thành công");
         }
         catch (Exception e)
         {
@@ -112,8 +112,8 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
         {
             var result = await _repository.GetAsync<TicketDetailDto>(new { ticket_id = request.ticket_id }, cancellationToken);
             if (result is null)
-                return new ResponseMessage<TicketDetailDto?>().MessageWarning("Không tìm thấy dữ liệu");
-            return new ResponseMessage<TicketDetailDto?>().MessageSuccess(result, "Thành công");
+                return new ResponseMessage<TicketDetailDto?>().MessageWarning("Không tìm thấy thông tin vé");
+            return new ResponseMessage<TicketDetailDto?>().MessageSuccess(result, "Lấy chi tiết vé thành công");
         }
         catch (Exception e)
         {
@@ -135,7 +135,7 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
                 ticket_status = request.ticket_status
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<TicketListDto>>().MessageSuccess(result ?? [], "Thành công");
+            return new ResponseMessage<IEnumerable<TicketListDto>>().MessageSuccess(result ?? [], "Lấy danh sách vé thành công");
         }
         catch (Exception e)
         {

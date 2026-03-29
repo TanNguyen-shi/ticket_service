@@ -64,7 +64,7 @@ public abstract class Repository<TEntity>(
     {
         var spName = GetSpName("insert");
 
-        return await _dapper.ExecStoreScalarAsync<string>(
+        return await _dapper.ExecStoreToStringAsync(
             Connection,
             spName,
             dto?.ToParameterArray(),
@@ -79,7 +79,7 @@ public abstract class Repository<TEntity>(
     {
         var spName = GetSpName("update");
 
-        return await _dapper.ExecStoreScalarAsync<string>(
+        return await _dapper.ExecStoreToStringAsync(
             Connection,
             spName,
             dto?.ToParameterArray(),
@@ -94,7 +94,7 @@ public abstract class Repository<TEntity>(
     {
         var spName = GetSpName("check");
 
-        return await _dapper.ExecStoreScalarAsync<string>(
+        return await _dapper.GetAsync<string>(
             Connection,
             spName,
             dto?.ToParameterArray(),
@@ -109,7 +109,7 @@ public abstract class Repository<TEntity>(
     {
         var spName = GetSpName("delete");
 
-        return await _dapper.ExecStoreScalarAsync<string>(
+        return await _dapper.ExecStoreToStringAsync(
             Connection,
             spName,
             dto?.ToParameterArray(),

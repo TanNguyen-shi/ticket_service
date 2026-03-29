@@ -58,6 +58,20 @@ public interface IDapperProcedureHelper
         NpgsqlTransaction? dbTransaction = null,
         CancellationToken cancellationToken = default);
 
+    Task<string?> ExecStoreToStringAsync(
+        string store,
+        object[]? parameters = null,
+        int timeout = 30,
+        CancellationToken cancellationToken = default);
+
+    Task<string?> ExecStoreToStringAsync(
+        NpgsqlConnection? db,
+        string store,
+        object[]? parameters = null,
+        int timeout = 30,
+        NpgsqlTransaction? dbTransaction = null,
+        CancellationToken cancellationToken = default);
+
     T? Get<T>(
         string store,
         object[]? parameters = null,

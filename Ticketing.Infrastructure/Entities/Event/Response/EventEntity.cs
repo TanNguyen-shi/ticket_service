@@ -8,8 +8,8 @@ public class EventEntity : BaseEntity
     public string? description { get; set; }
     public long venue_id { get; set; }
     public string? banner_url { get; set; }
-    public DateTime start_time { get; set; }
-    public DateTime end_time { get; set; }
+    public DateTime? start_time { get; set; }
+    public DateTime? end_time { get; set; }
     public DateTime? sale_start_time { get; set; }
     public DateTime? sale_end_time { get; set; }
     public string status { get; set; } = "draft";

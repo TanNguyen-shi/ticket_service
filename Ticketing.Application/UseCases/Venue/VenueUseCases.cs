@@ -125,4 +125,17 @@ public class VenueUseCases(IVenueDomainService venueDomain) : IVenueUseCases
             return new ResponseMessage<IEnumerable<VenueListDto>>().MessageError(e.Message);
         }
     }
+    
+    
+    public async Task<ResponseMessage<IEnumerable<VenueListDto>>> GetAllAsync(long? userLogin, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await venueDomain.GetAll(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<IEnumerable<VenueListDto>>().MessageError(e.Message);
+        }
+    }
 }

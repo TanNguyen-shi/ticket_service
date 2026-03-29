@@ -17,4 +17,5 @@ public interface IVenueUseCases
     Task<ResponseMessage<VenueDetailDto?>> GetByIdAsync(VenueGetByIdRequest request, long? userLogin, CancellationToken cancellationToken = default);
 
     Task<ResponseMessage<IEnumerable<VenueListDto>>> GetPagedListAsync(VenueGetPagedListRequest request, long? userLogin, CancellationToken cancellationToken = default);
+    Task<ResponseMessage<IEnumerable<VenueListDto>>> GetAllAsync(long? userLogin, CancellationToken cancellationToken = default);
 }

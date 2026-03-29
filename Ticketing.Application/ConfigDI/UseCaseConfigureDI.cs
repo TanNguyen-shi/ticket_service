@@ -14,6 +14,8 @@ using Ticketing.Application.UseCases.EventSeatInventory;
 using Ticketing.Application.UseCases.EventSeatInventory.Interfaces;
 using Ticketing.Application.UseCases.EventZone;
 using Ticketing.Application.UseCases.EventZone.Interfaces;
+using Ticketing.Application.UseCases.EventZonePrice;
+using Ticketing.Application.UseCases.EventZonePrice.Interfaces;
 using Ticketing.Application.UseCases.Ticket;
 using Ticketing.Application.UseCases.Ticket.Interfaces;
 using Ticketing.Application.UseCases.TicketOrder;
@@ -44,6 +46,7 @@ public static class UseCaseConfigureDI
         services.AddScoped<IEventPublishLogUseCases, EventPublishLogUseCases>();
         services.AddScoped<IEventSeatInventoryUseCases, EventSeatInventoryUseCases>();
         services.AddScoped<IEventZoneUseCases, EventZoneUseCases>();
+        services.AddScoped<IEventZonePriceUseCases, EventZonePriceUseCases>();
         services.AddScoped<ITicketOrderUseCases, TicketOrderUseCases>();
         services.AddScoped<ITicketOrderItemUseCases, TicketOrderItemUseCases>();
         services.AddScoped<ITicketUseCases, TicketUseCases>();

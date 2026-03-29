@@ -10,6 +10,7 @@ using Ticketing.Infrastructure.Repositories.Event;
 using Ticketing.Infrastructure.Repositories.EventPublishLog;
 using Ticketing.Infrastructure.Repositories.EventSeatInventory;
 using Ticketing.Infrastructure.Repositories.EventZone;
+using Ticketing.Infrastructure.Repositories.EventZonePrice;
 using Ticketing.Infrastructure.Repositories.Venue;
 using Ticketing.Infrastructure.Repositories.VenueSeat;
 using Ticketing.Infrastructure.Repositories.VenueSection;
@@ -58,6 +59,10 @@ public static class InfrastructureConfigDi
         //Event zone
         services.AddScoped<IEventZoneRepository, EventZoneRepository>();
         services.AddScoped<IEventZoneUnitOfWork, EventZoneUnitOfWork>();
+
+        //Event zone price
+        services.AddScoped<IEventZonePriceRepository, EventZonePriceRepository>();
+        services.AddScoped<IEventZonePriceUnitOfWork, EventZonePriceUnitOfWork>();
 
         //Ticketing (shared unit of work)
         services.AddScoped<ITicketOrderRepository, TicketOrderRepository>();

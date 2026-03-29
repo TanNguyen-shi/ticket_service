@@ -136,5 +136,16 @@ public class VenueSectionUseCases(IVenueSectionDomainService venueSectionDomain)
             return new ResponseMessage<IEnumerable<VenueSectionListDto>>().MessageError(e.Message);
         }
     }
-}
 
+    public async Task<ResponseMessage<IEnumerable<VenueSectionListDto>>> GetAllAsync(long? userLogin, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await venueSectionDomain.GetAllAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<IEnumerable<VenueSectionListDto>>().MessageError(e.Message);
+        }
+    }
+}

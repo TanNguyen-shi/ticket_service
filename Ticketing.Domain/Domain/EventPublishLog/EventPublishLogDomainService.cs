@@ -38,7 +38,7 @@ public class EventPublishLogDomainService(IEventPublishLogUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm lịch sử phát hành sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -71,7 +71,7 @@ public class EventPublishLogDomainService(IEventPublishLogUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật lịch sử phát hành sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -98,7 +98,7 @@ public class EventPublishLogDomainService(IEventPublishLogUnitOfWork unitOfWork)
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa lịch sử phát hành sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -119,9 +119,9 @@ public class EventPublishLogDomainService(IEventPublishLogUnitOfWork unitOfWork)
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<EventPublishLogDetailDto?>().MessageWarning("Không tìm thấy dữ liệu");
+                return new ResponseMessage<EventPublishLogDetailDto?>().MessageWarning("Không tìm thấy lịch sử phát hành sự kiện");
 
-            return new ResponseMessage<EventPublishLogDetailDto?>().MessageSuccess(result, "Thành công");
+            return new ResponseMessage<EventPublishLogDetailDto?>().MessageSuccess(result, "Lấy chi tiết lịch sử phát hành sự kiện thành công");
         }
         catch (Exception e)
         {
@@ -145,7 +145,7 @@ public class EventPublishLogDomainService(IEventPublishLogUnitOfWork unitOfWork)
                 new_status = request.new_status
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<EventPublishLogListDto>>().MessageSuccess(result ?? [], "Thành công");
+            return new ResponseMessage<IEnumerable<EventPublishLogListDto>>().MessageSuccess(result ?? [], "Lấy danh sách lịch sử phát hành sự kiện thành công");
         }
         catch (Exception e)
         {
