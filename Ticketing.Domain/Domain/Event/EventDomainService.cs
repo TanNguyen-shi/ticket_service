@@ -1,4 +1,5 @@
 using Ticketing.Application.Model.DTOs;
+using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.Event.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.Event.Request;
@@ -39,11 +40,11 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
-                throw new Exception("Thêm mới sự kiện thất bại");
+                throw new Exception(DomainMessageConstants.Event.InsertError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm sự kiện thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, DomainMessageConstants.Event.InsertSuccess);
         }
         catch (Exception e)
         {
@@ -81,11 +82,11 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Cập nhật sự kiện thất bại");
+                throw new Exception(DomainMessageConstants.Event.UpdateError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật sự kiện thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.Event.UpdateSuccess);
         }
         catch (Exception e)
         {
@@ -109,11 +110,11 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Xóa dữ liệu sự kiện thất bại");
+                throw new Exception(DomainMessageConstants.Event.DeleteError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa sự kiện thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.Event.DeleteSuccess);
         }
         catch (Exception e)
         {
@@ -132,9 +133,9 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<EventDetailDto?>().MessageWarning("Không tìm thấy thông tin sự kiện");
+                return new ResponseMessage<EventDetailDto?>().MessageWarning(DomainMessageConstants.Event.NotFound);
 
-            return new ResponseMessage<EventDetailDto?>().MessageSuccess(result, "Lấy chi tiết sự kiện thành công");
+            return new ResponseMessage<EventDetailDto?>().MessageSuccess(result, DomainMessageConstants.Event.GetDetailSuccess);
         }
         catch (Exception e)
         {
@@ -155,7 +156,7 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
                 venue_id = request.venue_id
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<EventListDto>>().MessageSuccess(result ?? [], "Lấy danh sách sự kiện thành công");
+            return new ResponseMessage<IEnumerable<EventListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.Event.GetListSuccess);
         }
         catch (Exception e)
         {

@@ -22,14 +22,8 @@ public class SysUserCreateRequest
     [StringLength(255, ErrorMessage = "full_name phải có tối đa 255 ký tự")]
     public string full_name { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "user_type là bắt buộc")]
-    [StringLength(30, ErrorMessage = "user_type phải có tối đa 30 ký tự")]
-    public string user_type { get; set; } = string.Empty;
-
     [Required(ErrorMessage = "status là bắt buộc")]
     [StringLength(30, ErrorMessage = "status phải có tối đa 30 ký tự")]
     public string status { get; set; } = string.Empty;
-
-    public DateTime? last_login_at { get; set; }
 }
 

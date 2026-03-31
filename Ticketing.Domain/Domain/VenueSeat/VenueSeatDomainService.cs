@@ -1,4 +1,5 @@
 using Ticketing.Application.Model.DTOs;
+using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.VenueSeat.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.VenueSeat.Request;
@@ -51,11 +52,11 @@ public class VenueSeatDomainService(IVenueSeatUnitOfWork unitOfWork)
             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
-                throw new Exception("Thêm mới ghế thất bại");
+                throw new Exception(DomainMessageConstants.VenueSeat.InsertError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm ghế thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, DomainMessageConstants.VenueSeat.InsertSuccess);
         }
         catch (Exception e)
         {
@@ -102,11 +103,11 @@ public class VenueSeatDomainService(IVenueSeatUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Cập nhật ghế thất bại");
+                throw new Exception(DomainMessageConstants.VenueSeat.UpdateError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật ghế thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.VenueSeat.UpdateSuccess);
         }
         catch (Exception e)
         {
@@ -130,11 +131,11 @@ public class VenueSeatDomainService(IVenueSeatUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Xóa dữ liệu ghế thất bại");
+                throw new Exception(DomainMessageConstants.VenueSeat.DeleteError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa ghế thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.VenueSeat.DeleteSuccess);
         }
         catch (Exception e)
         {
@@ -155,9 +156,9 @@ public class VenueSeatDomainService(IVenueSeatUnitOfWork unitOfWork)
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<VenueSeatDetailDto?>().MessageWarning("Không tìm thấy thông tin ghế");
+                return new ResponseMessage<VenueSeatDetailDto?>().MessageWarning(DomainMessageConstants.VenueSeat.NotFound);
 
-            return new ResponseMessage<VenueSeatDetailDto?>().MessageSuccess(result, "Lấy chi tiết ghế thành công");
+            return new ResponseMessage<VenueSeatDetailDto?>().MessageSuccess(result, DomainMessageConstants.VenueSeat.GetDetailSuccess);
         }
         catch (Exception e)
         {
@@ -182,7 +183,7 @@ public class VenueSeatDomainService(IVenueSeatUnitOfWork unitOfWork)
                 seat_type = request.seat_type
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<VenueSeatListDto>>().MessageSuccess(result ?? [], "Lấy danh sách ghế thành công");
+            return new ResponseMessage<IEnumerable<VenueSeatListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.VenueSeat.GetListSuccess);
         }
         catch (Exception e)
         {

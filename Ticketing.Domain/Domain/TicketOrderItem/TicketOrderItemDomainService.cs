@@ -1,4 +1,5 @@
 using Ticketing.Application.Model.DTOs;
+using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.TicketOrderItem.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.TicketOrderItem.Request;
@@ -34,10 +35,10 @@ public class TicketOrderItemDomainService(ITicketingUnitOfWork unitOfWork)
             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
-                throw new Exception("Thêm mới chi tiết đơn hàng thất bại");
+                throw new Exception(DomainMessageConstants.TicketOrderItem.InsertError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm chi tiết đơn hàng thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, DomainMessageConstants.TicketOrderItem.InsertSuccess);
         }
         catch (Exception e)
         {
@@ -67,10 +68,10 @@ public class TicketOrderItemDomainService(ITicketingUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Cập nhật chi tiết đơn hàng thất bại");
+                throw new Exception(DomainMessageConstants.TicketOrderItem.UpdateError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật chi tiết đơn hàng thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.TicketOrderItem.UpdateSuccess);
         }
         catch (Exception e)
         {
@@ -88,10 +89,10 @@ public class TicketOrderItemDomainService(ITicketingUnitOfWork unitOfWork)
             var result = await _repository.DeleteAsync(new { order_item_id = entity.order_item_id }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Xóa chi tiết đơn hàng thất bại");
+                throw new Exception(DomainMessageConstants.TicketOrderItem.DeleteError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa chi tiết đơn hàng thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.TicketOrderItem.DeleteSuccess);
         }
         catch (Exception e)
         {
@@ -106,8 +107,8 @@ public class TicketOrderItemDomainService(ITicketingUnitOfWork unitOfWork)
         {
             var result = await _repository.GetAsync<TicketOrderItemDetailDto>(new { order_item_id = request.order_item_id }, cancellationToken);
             if (result is null)
-                return new ResponseMessage<TicketOrderItemDetailDto?>().MessageWarning("Không tìm thấy thông tin chi tiết đơn hàng");
-            return new ResponseMessage<TicketOrderItemDetailDto?>().MessageSuccess(result, "Lấy chi tiết đơn hàng thành công");
+                return new ResponseMessage<TicketOrderItemDetailDto?>().MessageWarning(DomainMessageConstants.TicketOrderItem.NotFound);
+            return new ResponseMessage<TicketOrderItemDetailDto?>().MessageSuccess(result, DomainMessageConstants.TicketOrderItem.GetDetailSuccess);
         }
         catch (Exception e)
         {
@@ -129,7 +130,7 @@ public class TicketOrderItemDomainService(ITicketingUnitOfWork unitOfWork)
                 item_status = request.item_status
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<TicketOrderItemListDto>>().MessageSuccess(result ?? [], "Lấy danh sách chi tiết đơn hàng thành công");
+            return new ResponseMessage<IEnumerable<TicketOrderItemListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.TicketOrderItem.GetListSuccess);
         }
         catch (Exception e)
         {

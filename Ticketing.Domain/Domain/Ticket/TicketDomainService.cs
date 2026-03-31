@@ -1,4 +1,5 @@
 using Ticketing.Application.Model.DTOs;
+using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.Ticket.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.Ticket.Request;
@@ -37,10 +38,10 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
-                throw new Exception("Thêm mới vé thất bại");
+                throw new Exception(DomainMessageConstants.Ticket.InsertError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm vé thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, DomainMessageConstants.Ticket.InsertSuccess);
         }
         catch (Exception e)
         {
@@ -73,10 +74,10 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Cập nhật vé thất bại");
+                throw new Exception(DomainMessageConstants.Ticket.UpdateError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật vé thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.Ticket.UpdateSuccess);
         }
         catch (Exception e)
         {
@@ -94,10 +95,10 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
             var result = await _repository.DeleteAsync(new { ticket_id = entity.ticket_id }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Xóa vé thất bại");
+                throw new Exception(DomainMessageConstants.Ticket.DeleteError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa vé thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.Ticket.DeleteSuccess);
         }
         catch (Exception e)
         {
@@ -112,8 +113,8 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
         {
             var result = await _repository.GetAsync<TicketDetailDto>(new { ticket_id = request.ticket_id }, cancellationToken);
             if (result is null)
-                return new ResponseMessage<TicketDetailDto?>().MessageWarning("Không tìm thấy thông tin vé");
-            return new ResponseMessage<TicketDetailDto?>().MessageSuccess(result, "Lấy chi tiết vé thành công");
+                return new ResponseMessage<TicketDetailDto?>().MessageWarning(DomainMessageConstants.Ticket.NotFound);
+            return new ResponseMessage<TicketDetailDto?>().MessageSuccess(result, DomainMessageConstants.Ticket.GetDetailSuccess);
         }
         catch (Exception e)
         {
@@ -135,7 +136,7 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
                 ticket_status = request.ticket_status
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<TicketListDto>>().MessageSuccess(result ?? [], "Lấy danh sách vé thành công");
+            return new ResponseMessage<IEnumerable<TicketListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.Ticket.GetListSuccess);
         }
         catch (Exception e)
         {

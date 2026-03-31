@@ -1,4 +1,5 @@
 using Ticketing.Application.Model.DTOs;
+using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.VenueSection.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.VenueSection.Request;
@@ -47,11 +48,11 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
-                throw new Exception("Thêm mới khu vực thất bại");
+                throw new Exception(DomainMessageConstants.VenueSection.InsertError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm khu vực thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, DomainMessageConstants.VenueSection.InsertSuccess);
         }
         catch (Exception e)
         {
@@ -93,11 +94,11 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Cập nhật khu vực thất bại");
+                throw new Exception(DomainMessageConstants.VenueSection.UpdateError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật khu vực thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.VenueSection.UpdateSuccess);
         }
         catch (Exception e)
         {
@@ -121,11 +122,11 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Xóa dữ liệu khu vực thất bại");
+                throw new Exception(DomainMessageConstants.VenueSection.DeleteError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa khu vực thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.VenueSection.DeleteSuccess);
         }
         catch (Exception e)
         {
@@ -148,7 +149,7 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
             if (result is null)
                 return new ResponseMessage<VenueSectionDetailDto?>().MessageWarning("Không tìm thấy thông tin khu vực");
 
-            return new ResponseMessage<VenueSectionDetailDto?>().MessageSuccess(result, "Lấy chi tiết khu vực thành công");
+            return new ResponseMessage<VenueSectionDetailDto?>().MessageSuccess(result, DomainMessageConstants.VenueSection.GetDetailSuccess);
         }
         catch (Exception e)
         {
@@ -171,7 +172,7 @@ public class VenueSectionDomainService(IVenueSectionUnitOfWork unitOfWork)
                 status = request.status
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<VenueSectionListDto>>().MessageSuccess(result ?? [], "Lấy danh sách khu vực thành công");
+            return new ResponseMessage<IEnumerable<VenueSectionListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.VenueSection.GetListSuccess);
         }
         catch (Exception e)
         {

@@ -1,4 +1,5 @@
 using Ticketing.Application.Model.DTOs;
+using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.EventZonePrice.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.EventZonePrice.Request;
@@ -34,11 +35,11 @@ public class EventZonePriceDomainService(IEventZonePriceUnitOfWork unitOfWork)
             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
-                throw new Exception("Thêm giá vé vùng sự kiện thất bại");
+                throw new Exception(DomainMessageConstants.EventZonePrice.InsertError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm giá vé vùng sự kiện thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, DomainMessageConstants.EventZonePrice.InsertSuccess);
         }
         catch (Exception e)
         {
@@ -68,11 +69,11 @@ public class EventZonePriceDomainService(IEventZonePriceUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Cập nhật giá vé vùng sự kiện thất bại");
+                throw new Exception(DomainMessageConstants.EventZonePrice.UpdateError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật giá vé vùng sự kiện thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.EventZonePrice.UpdateSuccess);
         }
         catch (Exception e)
         {
@@ -96,11 +97,11 @@ public class EventZonePriceDomainService(IEventZonePriceUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Xóa giá vé vùng sự kiện thất bại");
+                throw new Exception(DomainMessageConstants.EventZonePrice.DeleteError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa giá vé vùng sự kiện thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.EventZonePrice.DeleteSuccess);
         }
         catch (Exception e)
         {
@@ -121,9 +122,9 @@ public class EventZonePriceDomainService(IEventZonePriceUnitOfWork unitOfWork)
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<EventZonePriceDetailDto?>().MessageWarning("Không tìm thấy thông tin giá vé vùng sự kiện");
+                return new ResponseMessage<EventZonePriceDetailDto?>().MessageWarning(DomainMessageConstants.EventZonePrice.NotFound);
 
-            return new ResponseMessage<EventZonePriceDetailDto?>().MessageSuccess(result, "Lấy chi tiết giá vé vùng sự kiện thành công");
+            return new ResponseMessage<EventZonePriceDetailDto?>().MessageSuccess(result, DomainMessageConstants.EventZonePrice.GetDetailSuccess);
         }
         catch (Exception e)
         {
@@ -146,7 +147,7 @@ public class EventZonePriceDomainService(IEventZonePriceUnitOfWork unitOfWork)
                 is_active = request.is_active
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<EventZonePriceListDto>>().MessageSuccess(result ?? [], "Lấy danh sách giá vé vùng sự kiện thành công");
+            return new ResponseMessage<IEnumerable<EventZonePriceListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.EventZonePrice.GetListSuccess);
         }
         catch (Exception e)
         {

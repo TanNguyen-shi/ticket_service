@@ -1,4 +1,5 @@
 using Ticketing.Application.Model.DTOs;
+using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.SysUser.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.SysUser.Request;
@@ -27,17 +28,15 @@ public class SysUserDomainService(ISysAdminUnitOfWork unitOfWork)
                 phone = entity.phone,
                 password_hash = entity.password_hash,
                 full_name = entity.full_name,
-                user_type = entity.user_type,
                 status = entity.status,
-                last_login_at = entity.last_login_at,
                 created_by = entity.created_by
             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
-                throw new Exception("Them moi nguoi dung that bai");
+                throw new Exception(DomainMessageConstants.SysUser.InsertError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thanh cong");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, DomainMessageConstants.SysUser.InsertSuccess);
         }
         catch (Exception e)
         {
@@ -56,22 +55,18 @@ public class SysUserDomainService(ISysAdminUnitOfWork unitOfWork)
             var result = await _repository.UpdateAsync(new
             {
                 user_id = entity.user_id,
-                username = entity.username,
                 email = entity.email,
                 phone = entity.phone,
-                password_hash = entity.password_hash,
                 full_name = entity.full_name,
-                user_type = entity.user_type,
                 status = entity.status,
-                last_login_at = entity.last_login_at,
                 updated_by = entity.updated_by
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Cap nhat nguoi dung that bai");
+                throw new Exception(DomainMessageConstants.SysUser.UpdateError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thanh cong");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.SysUser.UpdateSuccess);
         }
         catch (Exception e)
         {
@@ -94,10 +89,10 @@ public class SysUserDomainService(ISysAdminUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Xoa nguoi dung that bai");
+                throw new Exception(DomainMessageConstants.SysUser.DeleteError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thanh cong");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.SysUser.DeleteSuccess);
         }
         catch (Exception e)
         {
@@ -116,9 +111,9 @@ public class SysUserDomainService(ISysAdminUnitOfWork unitOfWork)
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<SysUserDetailDto?>().MessageWarning("Khong tim thay du lieu");
+                return new ResponseMessage<SysUserDetailDto?>().MessageWarning(DomainMessageConstants.SysUser.NotFound);
 
-            return new ResponseMessage<SysUserDetailDto?>().MessageSuccess(result, "Thanh cong");
+            return new ResponseMessage<SysUserDetailDto?>().MessageSuccess(result, DomainMessageConstants.SysUser.GetDetailSuccess);
         }
         catch (Exception e)
         {
@@ -135,11 +130,10 @@ public class SysUserDomainService(ISysAdminUnitOfWork unitOfWork)
                 pagesize = request.pagesize,
                 offset = request.offset,
                 keysearch = request.keysearch,
-                user_type = request.user_type,
                 status = request.status
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<SysUserListDto>>().MessageSuccess(result ?? [], "Thanh cong");
+            return new ResponseMessage<IEnumerable<SysUserListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.SysUser.GetListSuccess);
         }
         catch (Exception e)
         {
@@ -147,4 +141,3 @@ public class SysUserDomainService(ISysAdminUnitOfWork unitOfWork)
         }
     }
 }
-

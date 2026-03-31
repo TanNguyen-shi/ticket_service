@@ -25,9 +25,7 @@ public class SysUserUseCases(
                 phone = request.phone,
                 password_hash = passwordHelper.HashPassword(request.password_hash),
                 full_name = request.full_name,
-                user_type = request.user_type,
                 status = request.status,
-                last_login_at = request.last_login_at,
                 created_by = userLogin
             }, cancellationToken);
 
@@ -50,14 +48,10 @@ public class SysUserUseCases(
             var update = await sysUserDomain.UpdateAsync(new SysUserEntity
             {
                 user_id = request.user_id,
-                username = request.username,
                 email = request.email,
                 phone = request.phone,
-                password_hash = passwordHelper.HashPassword(request.password_hash),
                 full_name = request.full_name,
-                user_type = request.user_type,
                 status = request.status,
-                last_login_at = request.last_login_at,
                 updated_by = userLogin
             }, cancellationToken);
 
@@ -118,7 +112,6 @@ public class SysUserUseCases(
                 pagesize = request.pagesize,
                 offset = request.offset,
                 keysearch = request.keysearch,
-                user_type = request.user_type,
                 status = request.status
             }, cancellationToken);
         }

@@ -35,17 +35,12 @@ public class AuthService(
             if (!passwordHelper.VerifyPassword(request.password, systemUser.password_hash))
                 return new ResponseMessage<AuthLoginDto>().MessageWarning("Mật khẩu không chính xác, vui lòng thử lại sau.");
 
-            var role = string.Equals(systemUser.user_type, "admin", StringComparison.OrdinalIgnoreCase)
-                ? "SUPER_ADMIN"
-                : "USER";
-
             var user = new JwtUserInfo
             {
                 user_id = systemUser.user_id,
                 username = systemUser.username,
                 full_name = systemUser.full_name,
-                user_type = systemUser.user_type,
-                roles = new List<string> { role }
+                roles = new List<string> { "admin" }
             };
 
             var accessToken = jwtTokenService.GenerateAccessToken(user);

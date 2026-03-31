@@ -1,4 +1,5 @@
 using Ticketing.Application.Model.DTOs;
+using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.SysUserRole.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.SysUserRole.Request;
@@ -30,10 +31,10 @@ public class SysUserRoleDomainService(ISysAdminUnitOfWork unitOfWork)
             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
-                throw new Exception("Them moi phan quyen that bai");
+                throw new Exception(DomainMessageConstants.SysUserRole.InsertError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thanh cong");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, DomainMessageConstants.SysUserRole.InsertSuccess);
         }
         catch (Exception e)
         {
@@ -59,10 +60,10 @@ public class SysUserRoleDomainService(ISysAdminUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Cap nhat phan quyen that bai");
+                throw new Exception(DomainMessageConstants.SysUserRole.UpdateError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thanh cong");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.SysUserRole.UpdateSuccess);
         }
         catch (Exception e)
         {
@@ -85,10 +86,10 @@ public class SysUserRoleDomainService(ISysAdminUnitOfWork unitOfWork)
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Xoa phan quyen that bai");
+                throw new Exception(DomainMessageConstants.SysUserRole.DeleteError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thanh cong");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.SysUserRole.DeleteSuccess);
         }
         catch (Exception e)
         {
@@ -107,9 +108,9 @@ public class SysUserRoleDomainService(ISysAdminUnitOfWork unitOfWork)
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<SysUserRoleDetailDto?>().MessageWarning("Khong tim thay du lieu");
+                return new ResponseMessage<SysUserRoleDetailDto?>().MessageWarning(DomainMessageConstants.SysUserRole.NotFound);
 
-            return new ResponseMessage<SysUserRoleDetailDto?>().MessageSuccess(result, "Thanh cong");
+            return new ResponseMessage<SysUserRoleDetailDto?>().MessageSuccess(result, DomainMessageConstants.SysUserRole.GetDetailSuccess);
         }
         catch (Exception e)
         {
@@ -130,7 +131,7 @@ public class SysUserRoleDomainService(ISysAdminUnitOfWork unitOfWork)
                 role_id = request.role_id
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<SysUserRoleListDto>>().MessageSuccess(result ?? [], "Thanh cong");
+            return new ResponseMessage<IEnumerable<SysUserRoleListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.SysUserRole.GetListSuccess);
         }
         catch (Exception e)
         {

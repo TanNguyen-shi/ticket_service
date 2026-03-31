@@ -1,4 +1,5 @@
 using Ticketing.Application.Model.DTOs;
+using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.EventSeatInventory.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.EventSeatInventory.Request;
@@ -36,11 +37,11 @@ public class EventSeatInventoryDomainService(IEventSeatInventoryUnitOfWork unitO
             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
-                throw new Exception("Thêm mới tồn kho ghế sự kiện thất bại");
+                throw new Exception(DomainMessageConstants.EventSeatInventory.InsertError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<int>().MessageSuccess(result ?? 0, "Thêm tồn kho ghế sự kiện thành công");
+            return new ResponseMessage<int>().MessageSuccess(result ?? 0, DomainMessageConstants.EventSeatInventory.InsertSuccess);
         }
         catch (Exception e)
         {
@@ -71,11 +72,11 @@ public class EventSeatInventoryDomainService(IEventSeatInventoryUnitOfWork unitO
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Cập nhật tồn kho ghế sự kiện thất bại");
+                throw new Exception(DomainMessageConstants.EventSeatInventory.UpdateError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Cập nhật tồn kho ghế sự kiện thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.EventSeatInventory.UpdateSuccess);
         }
         catch (Exception e)
         {
@@ -98,11 +99,11 @@ public class EventSeatInventoryDomainService(IEventSeatInventoryUnitOfWork unitO
             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
-                throw new Exception("Xóa tồn kho ghế sự kiện thất bại");
+                throw new Exception(DomainMessageConstants.EventSeatInventory.DeleteError);
 
             await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Xóa tồn kho ghế sự kiện thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.EventSeatInventory.DeleteSuccess);
         }
         catch (Exception e)
         {
@@ -123,9 +124,9 @@ public class EventSeatInventoryDomainService(IEventSeatInventoryUnitOfWork unitO
             }, cancellationToken);
 
             if (result is null)
-                return new ResponseMessage<EventSeatInventoryDetailDto?>().MessageWarning("Không tìm thấy thông tin tồn kho ghế sự kiện");
+                return new ResponseMessage<EventSeatInventoryDetailDto?>().MessageWarning(DomainMessageConstants.EventSeatInventory.NotFound);
 
-            return new ResponseMessage<EventSeatInventoryDetailDto?>().MessageSuccess(result, "Lấy chi tiết tồn kho ghế sự kiện thành công");
+            return new ResponseMessage<EventSeatInventoryDetailDto?>().MessageSuccess(result, DomainMessageConstants.EventSeatInventory.GetDetailSuccess);
         }
         catch (Exception e)
         {
@@ -149,7 +150,7 @@ public class EventSeatInventoryDomainService(IEventSeatInventoryUnitOfWork unitO
                 seat_status = request.seat_status
             }, cancellationToken);
 
-            return new ResponseMessage<IEnumerable<EventSeatInventoryListDto>>().MessageSuccess(result ?? [], "Lấy danh sách tồn kho ghế sự kiện thành công");
+            return new ResponseMessage<IEnumerable<EventSeatInventoryListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.EventSeatInventory.GetListSuccess);
         }
         catch (Exception e)
         {
