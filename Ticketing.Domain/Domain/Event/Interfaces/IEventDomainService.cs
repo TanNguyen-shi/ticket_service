@@ -17,5 +17,14 @@ public interface IEventDomainService
     Task<ResponseMessage<EventDetailDto?>> GetByIdAsync(EventGetByIdRequest request, CancellationToken cancellationToken = default);
 
     Task<ResponseMessage<IEnumerable<EventListDto>>> GetPagedListAsync(EventGetPagedListRequest request, CancellationToken cancellationToken = default);
+
+    // Client-side methods
+    Task<ResponseMessage<IEnumerable<EventClientDto>>> GetFeaturedAsync(EventGetFeaturedClientRequest request, CancellationToken cancellationToken = default);
+
+    Task<ResponseMessage<IEnumerable<EventClientDto>>> GetTrendingAsync(EventGetTrendingClientRequest request, CancellationToken cancellationToken = default);
+
+    Task<ResponseMessage<IEnumerable<EventClientDto>>> GetUpcomingAsync(EventGetUpcomingClientRequest request, CancellationToken cancellationToken = default);
+
+    Task<ResponseMessage<IEnumerable<EventClientDto>>> SearchAsync(EventSearchClientRequest request, CancellationToken cancellationToken = default);
 }
 

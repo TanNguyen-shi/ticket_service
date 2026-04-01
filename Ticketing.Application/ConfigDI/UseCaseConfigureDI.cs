@@ -43,6 +43,7 @@ public static class UseCaseConfigureDI
         services.AddScoped<IVenueSeatUseCases, VenueSeatUseCases>();
         services.AddScoped<IVenueSectionUseCases, VenueSectionUseCases>();
         services.AddScoped<IEventUseCases, EventUseCases>();
+        services.AddScoped<IEventClientUseCases, EventClientUseCases>();
         services.AddScoped<IEventPublishLogUseCases, EventPublishLogUseCases>();
         services.AddScoped<IEventSeatInventoryUseCases, EventSeatInventoryUseCases>();
         services.AddScoped<IEventZoneUseCases, EventZoneUseCases>();

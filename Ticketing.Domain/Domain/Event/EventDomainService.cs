@@ -36,6 +36,9 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
                 status = entity.status,
                 published_at = entity.published_at,
                 on_sale_at = entity.on_sale_at,
+                is_featured = entity.is_featured,
+                is_trending = entity.is_trending,
+                display_order = entity.display_order,
                 created_by = entity.created_by
             }, cancellationToken)!.ToIntAsync();
 
@@ -78,6 +81,9 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
                 status = entity.status,
                 published_at = entity.published_at,
                 on_sale_at = entity.on_sale_at,
+                is_featured = entity.is_featured,
+                is_trending = entity.is_trending,
+                display_order = entity.display_order,
                 updated_by = entity.updated_by
             }, cancellationToken)!.ToBoolAsync();
 
@@ -153,7 +159,9 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
                 offset = request.offset,
                 keysearch = request.keysearch,
                 status = request.status,
-                venue_id = request.venue_id
+                venue_id = request.venue_id,
+                is_featured = request.is_featured,
+                is_trending = request.is_trending
             }, cancellationToken);
 
             return new ResponseMessage<IEnumerable<EventListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.Event.GetListSuccess);
@@ -161,6 +169,58 @@ public class EventDomainService(IEventUnitOfWork unitOfWork)
         catch (Exception e)
         {
             return new ResponseMessage<IEnumerable<EventListDto>>().MessageError(e.Message);
+        }
+    }
+
+    public async Task<ResponseMessage<IEnumerable<EventClientDto>>> GetFeaturedAsync(EventGetFeaturedClientRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await _repository.GetFeaturedAsync(request, cancellationToken);
+            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageSuccess(result ?? [], "Lấy danh sách sự kiện nổi bật thành công");
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageError(e.Message);
+        }
+    }
+
+    public async Task<ResponseMessage<IEnumerable<EventClientDto>>> GetTrendingAsync(EventGetTrendingClientRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await _repository.GetTrendingAsync(request, cancellationToken);
+            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageSuccess(result ?? [], "Lấy danh sách sự kiện xu hướng thành công");
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageError(e.Message);
+        }
+    }
+
+    public async Task<ResponseMessage<IEnumerable<EventClientDto>>> GetUpcomingAsync(EventGetUpcomingClientRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await _repository.GetUpcomingAsync(request, cancellationToken);
+            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageSuccess(result ?? [], "Lấy danh sách sự kiện sắp tới thành công");
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageError(e.Message);
+        }
+    }
+
+    public async Task<ResponseMessage<IEnumerable<EventClientDto>>> SearchAsync(EventSearchClientRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await _repository.SearchAsync(request, cancellationToken);
+            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageSuccess(result ?? [], "Tìm kiếm sự kiện thành công");
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageError(e.Message);
         }
     }
 }

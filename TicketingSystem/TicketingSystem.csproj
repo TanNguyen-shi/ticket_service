@@ -32,7 +32,6 @@
 
     <ItemGroup>
       <Folder Include="Configures\" />
-      <Folder Include="Controllers\Client\" />
     </ItemGroup>
 
 </Project>

@@ -15,5 +15,8 @@ public class EventEntity : BaseEntity
     public string status { get; set; } = "draft";
     public DateTime? published_at { get; set; }
     public DateTime? on_sale_at { get; set; }
+    public bool is_featured { get; set; } = false;
+    public bool is_trending { get; set; } = false;
+    public int display_order { get; set; } = 0;
 }
 

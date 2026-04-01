@@ -1,5 +1,6 @@
 using Ticketing.Application.Model.DTOs;
 using Ticketing.Application.UseCases.Event.Interfaces;
+using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.Event.Interfaces;
 using Ticketing.Infrastructure.DTOs;
 using Ticketing.Infrastructure.DTOs.Event.Request;
@@ -30,13 +31,16 @@ public class EventUseCases(IEventDomainService eventDomain) : IEventUseCases
                 status = request.status,
                 published_at = request.published_at,
                 on_sale_at = request.on_sale_at,
+                is_featured = request.is_featured,
+                is_trending = request.is_trending,
+                display_order = request.display_order,
                 created_by = userLogin
             }, cancellationToken);
 
             if (!insert.issuccess)
-                return new ResponseMessage<int>().MessageError(insert.message ?? "Thêm mới sự kiện thất bại");
+                return new ResponseMessage<int>().MessageError(insert.message ?? DomainMessageConstants.Event.InsertError);
 
-            return new ResponseMessage<int>().MessageSuccess(insert.data, "Thành công");
+            return new ResponseMessage<int>().MessageSuccess(insert.data, DomainMessageConstants.Event.InsertSuccess);
         }
         catch (Exception e)
         {
@@ -65,13 +69,16 @@ public class EventUseCases(IEventDomainService eventDomain) : IEventUseCases
                 status = request.status,
                 published_at = request.published_at,
                 on_sale_at = request.on_sale_at,
+                is_featured = request.is_featured,
+                is_trending = request.is_trending,
+                display_order = request.display_order,
                 updated_by = userLogin
             }, cancellationToken);
 
             if (!update.issuccess)
-                return new ResponseMessage<bool>().MessageError(update.message ?? "Cập nhật sự kiện thất bại");
+                return new ResponseMessage<bool>().MessageError(update.message ?? DomainMessageConstants.Event.UpdateError);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.Event.UpdateSuccess);
         }
         catch (Exception e)
         {
@@ -92,9 +99,9 @@ public class EventUseCases(IEventDomainService eventDomain) : IEventUseCases
             }, cancellationToken);
 
             if (!delete.issuccess)
-                return new ResponseMessage<bool>().MessageError(delete.message ?? "Xóa sự kiện thất bại");
+                return new ResponseMessage<bool>().MessageError(delete.message ?? DomainMessageConstants.Event.DeleteError);
 
-            return new ResponseMessage<bool>().MessageSuccess(true, "Thành công");
+            return new ResponseMessage<bool>().MessageSuccess(true, DomainMessageConstants.Event.DeleteSuccess);
         }
         catch (Exception e)
         {
@@ -121,14 +128,7 @@ public class EventUseCases(IEventDomainService eventDomain) : IEventUseCases
     {
         try
         {
-            return await eventDomain.GetPagedListAsync(new EventGetPagedListRequest
-            {
-                pagesize = request.pagesize,
-                offset = request.offset,
-                keysearch = request.keysearch,
-                status = request.status,
-                venue_id = request.venue_id
-            }, cancellationToken);
+            return await eventDomain.GetPagedListAsync(request, cancellationToken);
         }
         catch (Exception e)
         {

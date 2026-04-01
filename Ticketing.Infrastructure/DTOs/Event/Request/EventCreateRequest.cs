@@ -37,6 +37,12 @@ public class EventCreateRequest : IValidatableObject
     public DateTime? published_at { get; set; }
     public DateTime? on_sale_at { get; set; }
 
+    public bool is_featured { get; set; } = false;
+    public bool is_trending { get; set; } = false;
+
+    [Range(0, int.MaxValue, ErrorMessage = "display_order phải lớn hơn hoặc bằng 0")]
+    public int display_order { get; set; } = 0;
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (end_time < start_time)
