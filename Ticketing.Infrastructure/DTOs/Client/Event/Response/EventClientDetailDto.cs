@@ -1,23 +1,23 @@
-namespace Ticketing.Infrastructure.DTOs.Event.Response;
+namespace Ticketing.Infrastructure.DTOs.Client.Event.Response;
 
 /// <summary>
 /// Lightweight Event DTO cho phía Client (Homepage, Explore...)
 /// Chỉ chứa thông tin cần thiết, không chứa audit fields
 /// </summary>
-public class EventClientDto
+public class EventClientDetailDto
 {
     public long event_id { get; set; }
     public string event_code { get; set; } = string.Empty;
     public string event_name { get; set; } = string.Empty;
     public string? description { get; set; }
-    
+
     // Venue Info
     public long venue_id { get; set; }
     public string? venue_code { get; set; }
     public string? venue_name { get; set; }
     public string? city { get; set; }
     public string? country { get; set; }
-    
+
     // Event Details
     public string? banner_url { get; set; }
     public DateTime start_time { get; set; }
@@ -27,10 +27,31 @@ public class EventClientDto
     public string status { get; set; } = string.Empty;
     public DateTime? published_at { get; set; }
     public DateTime? on_sale_at { get; set; }
-    
-    // New Fields
     public bool is_featured { get; set; } = false;
     public bool is_trending { get; set; } = false;
     public int display_order { get; set; } = 0;
+
+    public List<EventZoneDto> zones { get; set; } = new List<EventZoneDto>();
 }
 
+public class EventZoneDto
+{
+    public long event_zone_id { get; set; }
+    public string zone_code { get; set; } = string.Empty;
+    public string zone_name { get; set; } = string.Empty;
+    public string? color_hex { get; set; }
+    public string? description { get; set; }
+    public int display_order { get; set; } = 0;
+    public string status { get; set; } = string.Empty;
+    public List<EventZonePriceDto> prices { get; set; } = new List<EventZonePriceDto>();
+}
+
+public class EventZonePriceDto
+{
+    public long event_zone_price_id { get; set; }
+    public long event_id { get; set; }
+    public double price { get; set; }
+    public string currency { get; set; } = string.Empty;
+    public DateTime? start_time { get; set; }
+    public DateTime? end_time { get; set; }
+}

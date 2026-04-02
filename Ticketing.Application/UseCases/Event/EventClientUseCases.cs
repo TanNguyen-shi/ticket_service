@@ -1,6 +1,8 @@
 using Ticketing.Application.Model.DTOs;
 using Ticketing.Application.UseCases.Event.Interfaces;
 using Ticketing.Domain.Domain.Event.Interfaces;
+using Ticketing.Infrastructure.DTOs.Client.Event.Request;
+using Ticketing.Infrastructure.DTOs.Client.Event.Response;
 using Ticketing.Infrastructure.DTOs.Event.Request;
 using Ticketing.Infrastructure.DTOs.Event.Response;
 
@@ -12,7 +14,7 @@ namespace Ticketing.Application.UseCases.Event;
 /// </summary>
 public class EventClientUseCases(IEventDomainService eventDomain) : IEventClientUseCases
 {
-    public async Task<ResponseMessage<IEnumerable<EventClientDto>>> GetFeaturedAsync(EventGetFeaturedClientRequest request, CancellationToken cancellationToken = default)
+    public async Task<ResponseMessage<IEnumerable<EventClientListDto>>> GetFeaturedAsync(EventGetFeaturedClientRequest request, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -20,11 +22,11 @@ public class EventClientUseCases(IEventDomainService eventDomain) : IEventClient
         }
         catch (Exception e)
         {
-            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageError(e.Message);
+            return new ResponseMessage<IEnumerable<EventClientListDto>>().MessageError(e.Message);
         }
     }
 
-    public async Task<ResponseMessage<IEnumerable<EventClientDto>>> GetTrendingAsync(EventGetTrendingClientRequest request, CancellationToken cancellationToken = default)
+    public async Task<ResponseMessage<IEnumerable<EventClientListDto>>> GetTrendingAsync(EventGetTrendingClientRequest request, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -32,11 +34,11 @@ public class EventClientUseCases(IEventDomainService eventDomain) : IEventClient
         }
         catch (Exception e)
         {
-            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageError(e.Message);
+            return new ResponseMessage<IEnumerable<EventClientListDto>>().MessageError(e.Message);
         }
     }
 
-    public async Task<ResponseMessage<IEnumerable<EventClientDto>>> GetUpcomingAsync(EventGetUpcomingClientRequest request, CancellationToken cancellationToken = default)
+    public async Task<ResponseMessage<IEnumerable<EventClientListDto>>> GetUpcomingAsync(EventGetUpcomingClientRequest request, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -44,11 +46,11 @@ public class EventClientUseCases(IEventDomainService eventDomain) : IEventClient
         }
         catch (Exception e)
         {
-            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageError(e.Message);
+            return new ResponseMessage<IEnumerable<EventClientListDto>>().MessageError(e.Message);
         }
     }
 
-    public async Task<ResponseMessage<IEnumerable<EventClientDto>>> SearchAsync(EventSearchClientRequest request, CancellationToken cancellationToken = default)
+    public async Task<ResponseMessage<IEnumerable<EventClientListDto>>> SearchAsync(EventSearchClientRequest request, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -56,8 +58,19 @@ public class EventClientUseCases(IEventDomainService eventDomain) : IEventClient
         }
         catch (Exception e)
         {
-            return new ResponseMessage<IEnumerable<EventClientDto>>().MessageError(e.Message);
+            return new ResponseMessage<IEnumerable<EventClientListDto>>().MessageError(e.Message);
+        }
+    }
+
+    public async Task<ResponseMessage<EventClientDetailDto?>> GetDetailEvent(EventGetByIdRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await eventDomain.GetEventDetail(request, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            return new ResponseMessage<EventClientDetailDto?>().MessageError(e.Message);
         }
     }
 }
-

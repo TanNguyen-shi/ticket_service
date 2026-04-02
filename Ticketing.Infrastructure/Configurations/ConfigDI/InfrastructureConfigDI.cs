@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Ticketing.Infrastructure.Configurations.Options;
 using Ticketing.Infrastructure.Helpers.Impl;
 using Ticketing.Infrastructure.Helpers.Interfaces;
 using Ticketing.Infrastructure.JWT;
@@ -27,6 +28,21 @@ public static class InfrastructureConfigDi
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<RedisCacheOptions>(configuration.GetSection(RedisCacheOptions.SectionName));
+
+        var redisSection = configuration.GetSection(RedisCacheOptions.SectionName);
+        var redisConnectionString = redisSection["ConnectionString"] ?? "localhost:6379,abortConnect=false";
+        var redisInstanceName = redisSection["InstanceName"] ?? "ticketing:";
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = redisConnectionString;
+            options.InstanceName = redisInstanceName;
+        });
+
+        services.AddScoped<ICacheService, RedisCacheService>();
+        services.AddScoped<ICacheKeyHelper, CacheKeyHelper>();
+
         services.AddSingleton<DapperContext>();
         services.AddScoped<DapperContextAccessor>();
         services.AddHttpContextAccessor();

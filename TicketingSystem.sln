@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ticketing.Domain", "Ticketi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ticketing.Infrastructure", "Ticketing.Infrastructure\Ticketing.Infrastructure.csproj", "{B7EC1987-6EA7-4654-83F1-F2FB99C86CD2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{A4971444-F439-4E64-AE78-5F4FC1FE5D29}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +32,5 @@ Global
 		{B7EC1987-6EA7-4654-83F1-F2FB99C86CD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{C4265A34-DB59-4818-B9DD-3CB2967970FC} = {A4971444-F439-4E64-AE78-5F4FC1FE5D29}
 	EndGlobalSection
 EndGlobal

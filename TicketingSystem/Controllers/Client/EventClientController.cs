@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Ticketing.Application.UseCases.Event.Interfaces;
+using Ticketing.Infrastructure.DTOs.Client.Event.Request;
 using Ticketing.Infrastructure.DTOs.Event.Request;
 using Ticketing.Infrastructure.DTOs.Event.Response;
 
@@ -69,13 +70,16 @@ public class EventClientController(IEventClientUseCases eventUseCases) : Control
     /// Response trả về danh sách sự kiện + metadata pagination
     /// </remarks>
     [HttpGet("search")]
-    public async Task<IActionResult> Search(
-        [FromQuery] EventSearchClientRequest request,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Search([FromQuery] EventSearchClientRequest request, CancellationToken cancellationToken = default)
     {
         var result = await eventUseCases.SearchAsync(request, cancellationToken);
         return Ok(result);
     }
+    
+    [HttpGet("detail")]
+    public async Task<IActionResult> Detail([FromQuery] EventGetByIdRequest request, CancellationToken cancellationToken = default)
+    {
+        var result = await eventUseCases.GetDetailEvent(request, cancellationToken);
+        return Ok(result);
+    }
 }
-
-
