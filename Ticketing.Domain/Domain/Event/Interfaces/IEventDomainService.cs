@@ -1,5 +1,6 @@
 using Ticketing.Application.Model.DTOs;
 using Ticketing.Infrastructure.DTOs;
+using Ticketing.Infrastructure.DTOs.Admin.Event.Request;
 using Ticketing.Infrastructure.DTOs.Client.Event.Request;
 using Ticketing.Infrastructure.DTOs.Client.Event.Response;
 using Ticketing.Infrastructure.DTOs.Event.Request;

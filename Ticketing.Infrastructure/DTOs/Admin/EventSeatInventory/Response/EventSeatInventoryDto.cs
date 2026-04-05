@@ -1,4 +1,4 @@
-namespace Ticketing.Infrastructure.DTOs.EventSeatInventory.Response;
+namespace Ticketing.Infrastructure.DTOs.Admin.EventSeatInventory.Response;
 
 public class EventSeatInventoryDto
 {
@@ -22,5 +22,6 @@ public class EventSeatInventoryDto
     public decimal base_price { get; set; }
     public int version { get; set; }
     public DateTime updated_at { get; set; }
+   
 }
 

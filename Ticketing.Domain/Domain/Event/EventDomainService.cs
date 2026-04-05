@@ -2,25 +2,33 @@ using Ticketing.Application.Model.DTOs;
 using Ticketing.Domain.Constants;
 using Ticketing.Domain.Domain.Event.Interfaces;
 using Ticketing.Infrastructure.DTOs;
+using Ticketing.Infrastructure.DTOs.Admin.Event.Request;
+using Ticketing.Infrastructure.DTOs.Admin.EventSeatInventory.Response;
+using Ticketing.Infrastructure.DTOs.Admin.EventZonePrice.Response;
 using Ticketing.Infrastructure.DTOs.Client.Event.Request;
 using Ticketing.Infrastructure.DTOs.Client.Event.Response;
 using Ticketing.Infrastructure.DTOs.Event.Request;
 using Ticketing.Infrastructure.DTOs.Event.Response;
+using Ticketing.Infrastructure.DTOs.EventZonePrice.Response;
 using Ticketing.Infrastructure.Entities;
 using Ticketing.Infrastructure.Entities.Event.Response;
+using Ticketing.Infrastructure.Entities.EventZoneSection.Response;
 using Ticketing.Infrastructure.Extensions;
 using Ticketing.Infrastructure.Helpers.Interfaces;
 using Ticketing.Infrastructure.Repositories.Event;
+using Ticketing.Infrastructure.Repositories.Venue;
 
 namespace Ticketing.Domain.Domain.Event;
 
 public class EventDomainService(
     IEventUnitOfWork unitOfWork,
+    IVenueUnitOfWork venueUnitOfWork,
     ICacheService cacheService,
     ICacheKeyHelper cacheKeyHelper)
     : BaseService<IEventRepository, EventEntity>(unitOfWork.Event, TicketingTypeEnum.Event), IEventDomainService
 {
     private static readonly TimeSpan EventDetailCacheTtl = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan EventSeatCache = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan EventClientListCacheTtl = TimeSpan.FromMinutes(3);
     private static readonly TimeSpan EventSearchCacheTtl = TimeSpan.FromMinutes(2);
     private static readonly TimeSpan EventClientCacheVersionTtl = TimeSpan.FromDays(30);
@@ -290,12 +298,17 @@ public class EventDomainService(
 
     public async Task<ResponseMessage<EventClientDetailDto?>> GetEventDetail(EventGetByIdRequest request, CancellationToken cancellationToken = default)
     {
+        await unitOfWork.OpenAsync(cancellationToken);
+        await unitOfWork.BeginTransactionAsync(cancellationToken);
         try
         {
             var cacheKey = cacheKeyHelper.Build("ticketing:event:detail:v1", request);
             var cachedResult = await cacheService.GetAsync<EventClientDetailDto>(cacheKey, cancellationToken);
+
             if (cachedResult is not null)
             {
+                // ✅ Cache hit - nhưng vẫn cần fetch real-time seat status
+                await PopulateSeatStatusAsync(cachedResult, request.event_id, cancellationToken);
                 return new ResponseMessage<EventClientDetailDto?>().MessageSuccess(cachedResult, DomainMessageConstants.Event.GetDetailSuccess);
             }
 
@@ -307,29 +320,168 @@ public class EventDomainService(
             if (result is null)
                 return new ResponseMessage<EventClientDetailDto?>().MessageError(DomainMessageConstants.Event.NotFound);
 
-            //Lấy thông tin zones
+            // 🎯 STEP 1: Lấy tất cả zones của event
             var zones = (await unitOfWork.EventZone.GetByEventId<EventZoneDto>(new
             {
                 event_id = request.event_id
             }, cancellationToken)).ToList();
 
-            foreach (var zone in zones)
+            if (zones.Count == 0)
             {
-                zone.prices = (await unitOfWork.EventZonePrice.GetByZoneId<EventZonePriceDto>(new
+                result.zones = zones;
+                await cacheService.SetAsync(cacheKey, result, EventDetailCacheTtl, cancellationToken);
+                return new ResponseMessage<EventClientDetailDto?>().MessageSuccess(result, DomainMessageConstants.Event.GetDetailSuccess);
+            }
+
+            // 🎯 STEP 2: Batch - Lấy tất cả prices của tất cả zones (1 query thay vì N)
+            var zoneIds = zones.Select(z => z.event_zone_id).ToArray();
+            var allPrices = (await unitOfWork.EventZonePrice.GetByZoneIds<EventZonePriceDto>(new
+            {
+                event_zone_ids = zoneIds
+            }, cancellationToken)).ToList();
+
+            // 🎯 STEP 3: Batch - Lấy tất cả zone sections (1 query thay vì N)
+            var allZoneSections = (await unitOfWork.EventZoneSection.GetByEventId<EventZoneSectionEntity>(new
+            {
+                event_id = request.event_id
+            }, cancellationToken)).ToList();
+
+            if (allZoneSections.Count > 0)
+            {
+                // 🎯 STEP 4: Batch - Lấy tất cả seats từ tất cả sections (1 query thay vì M)
+                var sectionIds = allZoneSections.Select(s => s.section_id).Distinct().ToArray();
+                var allSeats = (await venueUnitOfWork.VenueSeat.GetBySectionIds<EventVenueSeatDto>(new
                 {
-                    event_zone_id = zone.event_zone_id
+                    section_ids = sectionIds
                 }, cancellationToken)).ToList();
+
+                // ⚡ Map in-memory (không gọi DB thêm nữa)
+                var seatLookup = allSeats
+                    .GroupBy(s => s.section_id)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                var zoneSectionLookup = allZoneSections
+                    .GroupBy(zs => zs.event_zone_id)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                var priceLookup = allPrices
+                    .GroupBy(p => p.event_zone_id)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                // ⚡ Populate zones - gọi DateTime.UtcNow 1 lần
+                var now = DateTime.UtcNow;
+
+                foreach (var zone in zones)
+                {
+                    // Set current price theo thời gian hiện tại
+                    if (priceLookup.TryGetValue(zone.event_zone_id, out var prices))
+                    {
+                        var currentPrice = prices.FirstOrDefault(p =>
+                            (p.start_time <= now || p.start_time == null) &&
+                            (p.end_time >= now || p.end_time == null));
+
+                        if (currentPrice is not null)
+                            zone.current_price = currentPrice.price;
+                    }
+
+                    // Set seats cho zone
+                    if (zoneSectionLookup.TryGetValue(zone.event_zone_id, out var zoneSections))
+                    {
+                        var zoneSeats = new List<EventVenueSeatDto>();
+                        foreach (var section in zoneSections)
+                        {
+                            if (seatLookup.TryGetValue(section.section_id, out var sectSeats))
+                                zoneSeats.AddRange(sectSeats);
+                        }
+
+                        zone.seats = zoneSeats;
+                    }
+                }
             }
 
             result.zones = zones;
-
+            // ✅ Cache toàn bộ result (static data)
             await cacheService.SetAsync(cacheKey, result, EventDetailCacheTtl, cancellationToken);
+
+            // 🎯 STEP 5: Fetch seat status REAL-TIME (ngoài cache)
+            await PopulateSeatStatusAsync(result, request.event_id, cancellationToken);
+
+            await unitOfWork.CommitAsync(cancellationToken: cancellationToken);
 
             return new ResponseMessage<EventClientDetailDto?>().MessageSuccess(result, DomainMessageConstants.Event.GetDetailSuccess);
         }
         catch (Exception e)
         {
+            await unitOfWork.RollbackAsync(cancellationToken: cancellationToken);
             return new ResponseMessage<EventClientDetailDto?>().MessageError(e.Message);
+        }
+        finally
+        {
+        }
+    }
+
+    private async Task PopulateSeatStatusAsync(EventClientDetailDto result, long eventId, CancellationToken cancellationToken)
+    {
+        if (result?.zones == null || result.zones.Count == 0)
+            return;
+
+        try
+        {
+            // Collect toàn bộ seat IDs
+            var allSeatIds = result.zones
+                .SelectMany(z => z.seats ?? new List<EventVenueSeatDto>())
+                .Select(s => s.seat_id)
+                .Distinct()
+                .ToArray();
+
+            if (allSeatIds.Length == 0)
+                return;
+
+            // 🎯 Batch query seat status từ DB (REAL-TIME, không cache)
+            var seatStatuses = (await unitOfWork.EventSeatInventory
+                .GetBySeatIds<EventSeatInventoryDto>(new
+                {
+                    event_id = eventId,
+                    seat_ids = allSeatIds
+                }, cancellationToken)).ToList();
+
+            var statusLookup = seatStatuses
+                .GroupBy(s => s.seat_id)
+                .ToDictionary(g => g.Key, g => g.FirstOrDefault());
+
+            // Populate status vào từng seat
+            foreach (var zone in result.zones)
+            {
+                if (zone.seats?.Count > 0)
+                {
+                    foreach (var seat in zone.seats)
+                    {
+                        if (statusLookup.TryGetValue(seat.seat_id, out var status))
+                        {
+                            seat.event_seat_inventory_id = status?.event_seat_inventory_id;
+                            seat.status = status?.seat_status ?? "available";
+                            if (seat.status == "held" || seat.status == "locked")
+                            {
+                                seat.order_id = status?.current_hold_id;
+                            }
+                            else if (seat.status == "sold")
+                            {
+                                seat.order_id = status?.current_order_item_id;
+                            }
+                        }
+                        else
+                        {
+                            // Default: available nếu không có record trong inventory
+                            seat.status = "available";
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log nhưng không throw - seat status là optional
+            // Client có thể handle nếu không có status
         }
     }
 

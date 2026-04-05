@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Ticketing.Application.UseCases.Event.Interfaces;
+using Ticketing.Infrastructure.DTOs.Admin.Event.Request;
 using Ticketing.Infrastructure.DTOs.Event.Request;
 using Ticketing.Infrastructure.Helpers.Interfaces;
 

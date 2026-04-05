@@ -43,15 +43,22 @@ public class EventZoneDto
     public string? description { get; set; }
     public int display_order { get; set; } = 0;
     public string status { get; set; } = string.Empty;
-    public List<EventZonePriceDto> prices { get; set; } = new List<EventZonePriceDto>();
+    public decimal current_price { get; set; }
+    public List<EventVenueSeatDto> seats { get; set; } = new List<EventVenueSeatDto>();
 }
 
-public class EventZonePriceDto
+public class EventVenueSeatDto
 {
-    public long event_zone_price_id { get; set; }
-    public long event_id { get; set; }
-    public double price { get; set; }
-    public string currency { get; set; } = string.Empty;
-    public DateTime? start_time { get; set; }
-    public DateTime? end_time { get; set; }
+    public long seat_id { get; set; }
+    public long section_id { get; set; }
+    public decimal price { get; set; }
+    public string row_label { get; set; }
+    public string seat_number { get; set; }
+    public string seat_label { get; set; }
+    public decimal x_pos { get; set; }
+    public decimal y_pos { get; set; }
+    public string seat_type { get; set; }
+    public string status { get; set; }
+    public long? order_id { get; set; }
+    public long? event_seat_inventory_id { get; set; }
 }

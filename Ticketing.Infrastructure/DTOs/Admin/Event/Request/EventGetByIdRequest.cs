@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Ticketing.Infrastructure.DTOs.Event.Request;
+namespace Ticketing.Infrastructure.DTOs.Admin.Event.Request;
 
 public class EventGetByIdRequest
 {

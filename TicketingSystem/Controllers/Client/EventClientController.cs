@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Ticketing.Application.UseCases.Client.Event.Interfaces;
 using Ticketing.Application.UseCases.Event.Interfaces;
+using Ticketing.Infrastructure.DTOs.Admin.Event.Request;
 using Ticketing.Infrastructure.DTOs.Client.Event.Request;
 using Ticketing.Infrastructure.DTOs.Event.Request;
 using Ticketing.Infrastructure.DTOs.Event.Response;
@@ -75,7 +77,7 @@ public class EventClientController(IEventClientUseCases eventUseCases) : Control
         var result = await eventUseCases.SearchAsync(request, cancellationToken);
         return Ok(result);
     }
-    
+
     [HttpGet("detail")]
     public async Task<IActionResult> Detail([FromQuery] EventGetByIdRequest request, CancellationToken cancellationToken = default)
     {

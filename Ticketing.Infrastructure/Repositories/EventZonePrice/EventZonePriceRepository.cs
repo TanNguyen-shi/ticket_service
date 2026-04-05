@@ -8,6 +8,7 @@ namespace Ticketing.Infrastructure.Repositories.EventZonePrice;
 public interface IEventZonePriceRepository : IGenericRepository<EventZonePriceEntity>
 {
     Task<IEnumerable<TResult>> GetByZoneId<TResult>(object param, CancellationToken cancellationToken = default);
+    Task<IEnumerable<TResult>> GetByZoneIds<TResult>(object param, CancellationToken cancellationToken = default);
 }
 
 public class EventZonePriceRepository(
@@ -21,6 +22,18 @@ public class EventZonePriceRepository(
     public async Task<IEnumerable<TResult>> GetByZoneId<TResult>(object param, CancellationToken cancellationToken = default)
     {
         var spName = GetSpName("getbyzoneid");
+        return await _dapper.GetAllAsync<TResult>(
+            Connection,
+            spName,
+            param?.ToParameterArray(),
+            30,
+            Transaction,
+            cancellationToken);
+    }
+
+    public async Task<IEnumerable<TResult>> GetByZoneIds<TResult>(object param, CancellationToken cancellationToken = default)
+    {
+        var spName = GetSpName("getbyzoneids");
         return await _dapper.GetAllAsync<TResult>(
             Connection,
             spName,

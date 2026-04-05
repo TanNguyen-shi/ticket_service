@@ -1,3 +1,5 @@
+using Ticketing.Infrastructure.DTOs.Admin.EventZonePrice.Response;
+
 namespace Ticketing.Infrastructure.DTOs.EventZonePrice.Response;
 
 public class EventZonePriceListDto : EventZonePriceDto

@@ -1,4 +1,6 @@
-namespace Ticketing.Infrastructure.DTOs.Venue.Response;
+using Ticketing.Infrastructure.DTOs.Venue.Response;
+
+namespace Ticketing.Infrastructure.DTOs.Admin.Venue.Response;
 
 public class VenueListDto : VenueDto
 {

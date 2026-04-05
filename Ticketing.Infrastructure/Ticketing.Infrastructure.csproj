@@ -22,7 +22,6 @@
 
     <ItemGroup>
       <Folder Include="DTOs\Admin\" />
-      <Folder Include="DTOs\Client\Ticket\" />
     </ItemGroup>
 
 </Project>

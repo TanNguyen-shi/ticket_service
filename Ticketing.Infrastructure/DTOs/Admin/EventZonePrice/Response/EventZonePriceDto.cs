@@ -1,4 +1,4 @@
-namespace Ticketing.Infrastructure.DTOs.EventZonePrice.Response;
+namespace Ticketing.Infrastructure.DTOs.Admin.EventZonePrice.Response;
 
 public class EventZonePriceDto : AuditTable
 {

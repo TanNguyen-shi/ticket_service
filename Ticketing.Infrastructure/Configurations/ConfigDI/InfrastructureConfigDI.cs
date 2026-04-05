@@ -12,6 +12,7 @@ using Ticketing.Infrastructure.Repositories.EventPublishLog;
 using Ticketing.Infrastructure.Repositories.EventSeatInventory;
 using Ticketing.Infrastructure.Repositories.EventZone;
 using Ticketing.Infrastructure.Repositories.EventZonePrice;
+using Ticketing.Infrastructure.Repositories.EventZoneSection;
 using Ticketing.Infrastructure.Repositories.Venue;
 using Ticketing.Infrastructure.Repositories.VenueSeat;
 using Ticketing.Infrastructure.Repositories.VenueSection;
@@ -21,6 +22,9 @@ using Ticketing.Infrastructure.Repositories.TicketOrderItem;
 using Ticketing.Infrastructure.Repositories.Ticketing;
 using Ticketing.Infrastructure.Repositories.SysAdmin;
 using Ticketing.Infrastructure.Repositories.SysUserRole;
+using Ticketing.Infrastructure.Repositories.SeatHold;
+using Ticketing.Infrastructure.Repositories.Payment;
+using Ticketing.Infrastructure.Repositories.Idempotency;
 
 namespace Ticketing.Infrastructure.Configurations.ConfigDI;
 
@@ -80,6 +84,9 @@ public static class InfrastructureConfigDi
         services.AddScoped<IEventZonePriceRepository, EventZonePriceRepository>();
         services.AddScoped<IEventZonePriceUnitOfWork, EventZonePriceUnitOfWork>();
 
+        //Event zone section
+        services.AddScoped<IEventZoneSectionRepository, EventZoneSectionRepository>();
+
         //Ticketing (shared unit of work)
         services.AddScoped<ITicketOrderRepository, TicketOrderRepository>();
         services.AddScoped<ITicketOrderItemRepository, TicketOrderItemRepository>();
@@ -91,6 +98,31 @@ public static class InfrastructureConfigDi
         services.AddScoped<ISysUserRepository, SysUserRepository>();
         services.AddScoped<ISysUserRoleRepository, SysUserRoleRepository>();
         services.AddScoped<ISysAdminUnitOfWork, SysAdminUnitOfWork>();
+
+        //SeatHold Module (Booking Management)
+        services.AddScoped<ISeatHoldRepository, SeatHoldRepository>();
+        services.AddScoped<ISeatHoldItemRepository, SeatHoldItemRepository>();
+        services.AddScoped<ISeatHoldUnitOfWork>(provider =>
+            new SeatHoldUnitOfWork(
+                provider.GetRequiredService<DapperContext>(),
+                provider.GetRequiredService<DapperContextAccessor>(),
+                provider.GetRequiredService<IDapperProcedureHelper>()
+            )
+        );
+
+        //Payment Module (Payment & Callback Management)
+        services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
+        services.AddScoped<IPaymentCallbackLogRepository, PaymentCallbackLogRepository>();
+        services.AddScoped<IPaymentUnitOfWork>(provider =>
+            new PaymentUnitOfWork(
+                provider.GetRequiredService<DapperContext>(),
+                provider.GetRequiredService<DapperContextAccessor>(),
+                provider.GetRequiredService<IDapperProcedureHelper>()
+            )
+        );
+
+        //Idempotency Module (Anti-Duplicate Pattern)
+        services.AddScoped<IIdempotencyRequestRepository, IdempotencyRequestRepository>();
 
         services.AddScoped<IJWTTokenService, JwtTokenService>();
 
