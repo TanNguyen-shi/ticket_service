@@ -16,9 +16,9 @@ public class TicketCreateRequest
     [Range(1, long.MaxValue, ErrorMessage = "event_id phải lớn hơn 0")]
     public long event_id { get; set; }
 
-    [Required(ErrorMessage = "user_id là bắt buộc")]
-    [Range(1, long.MaxValue, ErrorMessage = "user_id phải lớn hơn 0")]
-    public long user_id { get; set; }
+    [Required(ErrorMessage = "customer_id là bắt buộc")]
+    [Range(1, long.MaxValue, ErrorMessage = "customer_id phải lớn hơn 0")]
+    public long customer_id { get; set; }
 
     [Required(ErrorMessage = "seat_id là bắt buộc")]
     [Range(1, long.MaxValue, ErrorMessage = "seat_id phải lớn hơn 0")]

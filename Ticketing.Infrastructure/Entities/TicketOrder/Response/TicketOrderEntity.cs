@@ -5,7 +5,7 @@ public class TicketOrderEntity : BaseEntity
     public long order_id { get; set; }
     public string order_code { get; set; } = string.Empty;
     public long event_id { get; set; }
-    public long user_id { get; set; }
+    public long customer_id { get; set; }
     public long? hold_id { get; set; }
     public decimal total_amount { get; set; }
     public decimal discount_amount { get; set; }

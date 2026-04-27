@@ -22,19 +22,19 @@ public class TicketOrderDomainService(ITicketingUnitOfWork unitOfWork)
         {
             await unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            var result = await _repository.InsertAsync(new
-            {
-                order_code = entity.order_code,
-                event_id = entity.event_id,
-                user_id = entity.user_id,
-                hold_id = entity.hold_id,
-                total_amount = entity.total_amount,
-                discount_amount = entity.discount_amount,
-                final_amount = entity.final_amount,
-                order_status = entity.order_status,
-                expired_at = entity.expired_at,
-                paid_at = entity.paid_at
-            }, cancellationToken)!.ToIntAsync();
+             var result = await _repository.InsertAsync(new
+             {
+                 order_code = entity.order_code,
+                 event_id = entity.event_id,
+                 customer_id = entity.customer_id,
+                 hold_id = entity.hold_id,
+                 total_amount = entity.total_amount,
+                 discount_amount = entity.discount_amount,
+                 final_amount = entity.final_amount,
+                 order_status = entity.order_status,
+                 expired_at = entity.expired_at,
+                 paid_at = entity.paid_at
+             }, cancellationToken)!.ToIntAsync();
 
             if (result is not > 0)
                 throw new Exception(DomainMessageConstants.TicketOrder.InsertError);
@@ -56,20 +56,20 @@ public class TicketOrderDomainService(ITicketingUnitOfWork unitOfWork)
         {
             await unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            var result = await _repository.UpdateAsync(new
-            {
-                order_id = entity.order_id,
-                order_code = entity.order_code,
-                event_id = entity.event_id,
-                user_id = entity.user_id,
-                hold_id = entity.hold_id,
-                total_amount = entity.total_amount,
-                discount_amount = entity.discount_amount,
-                final_amount = entity.final_amount,
-                order_status = entity.order_status,
-                expired_at = entity.expired_at,
-                paid_at = entity.paid_at
-            }, cancellationToken)!.ToBoolAsync();
+             var result = await _repository.UpdateAsync(new
+             {
+                 order_id = entity.order_id,
+                 order_code = entity.order_code,
+                 event_id = entity.event_id,
+                 customer_id = entity.customer_id,
+                 hold_id = entity.hold_id,
+                 total_amount = entity.total_amount,
+                 discount_amount = entity.discount_amount,
+                 final_amount = entity.final_amount,
+                 order_status = entity.order_status,
+                 expired_at = entity.expired_at,
+                 paid_at = entity.paid_at
+             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
                 throw new Exception(DomainMessageConstants.TicketOrder.UpdateError);
@@ -128,15 +128,15 @@ public class TicketOrderDomainService(ITicketingUnitOfWork unitOfWork)
     {
         try
         {
-            var result = await _repository.GetPagedAsync<TicketOrderListDto>(new
-            {
-                pagesize = request.pagesize,
-                offset = request.offset,
-                keysearch = request.keysearch,
-                event_id = request.event_id,
-                user_id = request.user_id,
-                order_status = request.order_status
-            }, cancellationToken);
+             var result = await _repository.GetPagedAsync<TicketOrderListDto>(new
+             {
+                 pagesize = request.pagesize,
+                 offset = request.offset,
+                 keysearch = request.keysearch,
+                 event_id = request.event_id,
+                 customer_id = request.customer_id,
+                 order_status = request.order_status
+             }, cancellationToken);
 
             return new ResponseMessage<IEnumerable<TicketOrderListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.TicketOrder.GetListSuccess);
         }

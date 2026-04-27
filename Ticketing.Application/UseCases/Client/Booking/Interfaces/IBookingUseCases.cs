@@ -13,5 +13,5 @@ namespace Ticketing.Application.UseCases.Client.Booking.Interfaces;
 /// </summary>
 public interface IBookingUseCases
 {
-    Task<ResponseMessage<BookingHoldSeatDto>> HoldSeat(BookingHoldSeatRequest request, CancellationToken cancellationToken = default);
+    Task<ResponseMessage<BookingHoldSeatDto>> HoldSeat(BookingHoldSeatRequest request, long userId, CancellationToken cancellationToken = default);
 }

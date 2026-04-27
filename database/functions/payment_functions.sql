@@ -250,9 +250,9 @@ BEGIN
         o.event_id,
         e.event_code,
         e.event_name,
-        o.user_id,
-        u.username,
-        u.full_name,
+        o.customer_id,
+        c.email,
+        c.full_name,
 
         p.payment_provider,
         p.payment_ref,
@@ -270,8 +270,8 @@ BEGIN
         ON o.order_id = p.order_id
     LEFT JOIN ticketing."event" e
         ON e.event_id = o.event_id
-    LEFT JOIN ticketing.sys_user u
-        ON u.user_id = o.user_id
+    LEFT JOIN ticketing.customer c
+        ON c.customer_id = o.customer_id
     WHERE p.payment_id = p_payment_id;
 
     RETURN v_out;
@@ -323,9 +323,9 @@ BEGIN
             o.event_id,
             e.event_code,
             e.event_name,
-            o.user_id,
-            u.username,
-            u.full_name,
+            o.customer_id,
+            c.email,
+            c.full_name,
 
             p.payment_provider,
             p.payment_ref,
@@ -341,8 +341,8 @@ BEGIN
             ON o.order_id = p.order_id
         LEFT JOIN ticketing."event" e
             ON e.event_id = o.event_id
-        LEFT JOIN ticketing.sys_user u
-            ON u.user_id = o.user_id
+        LEFT JOIN ticketing.customer c
+            ON c.customer_id = o.customer_id
         WHERE (
                 trim(coalesce(p_keysearch, '')) = ''
                 OR lower(p.payment_ref) LIKE '%' || lower(trim(p_keysearch)) || '%'
@@ -401,9 +401,9 @@ BEGIN
         o.event_id,
         e.event_code,
         e.event_name,
-        o.user_id,
-        u.username,
-        u.full_name,
+        o.customer_id,
+        c.email,
+        c.full_name,
 
         p.payment_provider,
         p.payment_ref,
@@ -421,8 +421,8 @@ BEGIN
         ON o.order_id = p.order_id
     LEFT JOIN ticketing."event" e
         ON e.event_id = o.event_id
-    LEFT JOIN ticketing.sys_user u
-        ON u.user_id = o.user_id
+    LEFT JOIN ticketing.customer c
+        ON c.customer_id = o.customer_id
     WHERE p.order_id = p_order_id;
 
     RETURN v_out;

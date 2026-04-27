@@ -6,7 +6,7 @@ public class TicketEntity : BaseEntity
     public string ticket_code { get; set; } = string.Empty;
     public long order_item_id { get; set; }
     public long event_id { get; set; }
-    public long user_id { get; set; }
+    public long customer_id { get; set; }
     public long seat_id { get; set; }
     public string? seat_label_snapshot { get; set; }
     public string? zone_name_snapshot { get; set; }

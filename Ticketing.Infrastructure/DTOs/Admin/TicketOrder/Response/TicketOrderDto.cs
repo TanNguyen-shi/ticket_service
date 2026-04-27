@@ -7,9 +7,9 @@ public class TicketOrderDto
     public long event_id { get; set; }
     public string? event_code { get; set; }
     public string? event_name { get; set; }
-    public long user_id { get; set; }
-    public string? username { get; set; }
-    public string? user_fullname { get; set; }
+    public long customer_id { get; set; }
+    public string? customer_email { get; set; }
+    public string? customer_fullname { get; set; }
     public long? hold_id { get; set; }
     public string? hold_code { get; set; }
     public decimal total_amount { get; set; }

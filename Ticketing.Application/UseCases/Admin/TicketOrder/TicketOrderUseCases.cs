@@ -19,7 +19,7 @@ public class TicketOrderUseCases(ITicketOrderDomainService ticketOrderDomain) : 
             {
                 order_code = request.order_code,
                 event_id = request.event_id,
-                user_id = request.user_id,
+                customer_id = request.customer_id,
                 hold_id = request.hold_id,
                 total_amount = request.total_amount,
                 discount_amount = request.discount_amount,
@@ -50,7 +50,7 @@ public class TicketOrderUseCases(ITicketOrderDomainService ticketOrderDomain) : 
                 order_id = request.order_id,
                 order_code = request.order_code,
                 event_id = request.event_id,
-                user_id = request.user_id,
+                customer_id = request.customer_id,
                 hold_id = request.hold_id,
                 total_amount = request.total_amount,
                 discount_amount = request.discount_amount,
@@ -114,7 +114,7 @@ public class TicketOrderUseCases(ITicketOrderDomainService ticketOrderDomain) : 
                 offset = request.offset,
                 keysearch = request.keysearch,
                 event_id = request.event_id,
-                user_id = request.user_id,
+                customer_id = request.customer_id,
                 order_status = request.order_status
             }, cancellationToken);
         }

@@ -49,7 +49,7 @@ $function$;
 CREATE OR REPLACE FUNCTION ticketing.seat_hold_insert(
     p_hold_code varchar,
     p_event_id bigint,
-    p_user_id bigint,
+    p_customer_id bigint,
     p_status varchar,
     p_hold_started_at timestamp without time zone,
     p_hold_expires_at timestamp without time zone,
@@ -64,7 +64,7 @@ AS $function$
     SELECT ticketing.seat_hold_insert(
         p_hold_code => 'HOLD0001',
         p_event_id => 5,
-        p_user_id => 1,
+        p_customer_id => 1,
         p_status => 'active',
         p_hold_started_at => now()::timestamp,
         p_hold_expires_at => (now() + interval '10 minute')::timestamp,
@@ -82,7 +82,7 @@ BEGIN
     (
         hold_code,
         event_id,
-        user_id,
+        customer_id,
         status,
         hold_started_at,
         hold_expires_at,
@@ -94,7 +94,7 @@ BEGIN
     (
         trim(p_hold_code),
         p_event_id,
-        p_user_id,
+        p_customer_id,
         p_status,
         p_hold_started_at,
         p_hold_expires_at,
@@ -117,7 +117,7 @@ CREATE OR REPLACE FUNCTION ticketing.seat_hold_update(
     p_hold_id bigint,
     p_hold_code varchar,
     p_event_id bigint,
-    p_user_id bigint,
+    p_customer_id bigint,
     p_status varchar,
     p_hold_started_at timestamp without time zone,
     p_hold_expires_at timestamp without time zone,
@@ -133,7 +133,7 @@ AS $function$
         p_hold_id => 1,
         p_hold_code => 'HOLD0001',
         p_event_id => 5,
-        p_user_id => 1,
+        p_customer_id => 1,
         p_status => 'released',
         p_hold_started_at => '2026-01-01 10:00:00'::timestamp,
         p_hold_expires_at => '2026-01-01 10:10:00'::timestamp,
@@ -150,7 +150,7 @@ BEGIN
     SET
         hold_code = trim(p_hold_code),
         event_id = p_event_id,
-        user_id = p_user_id,
+        customer_id = p_customer_id,
         status = p_status,
         hold_started_at = p_hold_started_at,
         hold_expires_at = p_hold_expires_at,
@@ -216,9 +216,9 @@ BEGIN
         h.event_id,
         e.event_code,
         e.event_name,
-        h.user_id,
-        u.username,
-        u.full_name,
+        h.customer_id,
+        c.email,
+        c.full_name,
         h.status,
         h.hold_started_at,
         h.hold_expires_at,
@@ -228,8 +228,8 @@ BEGIN
     FROM ticketing.seat_hold h
     LEFT JOIN ticketing."event" e
         ON e.event_id = h.event_id
-    LEFT JOIN ticketing.sys_user u
-        ON u.user_id = h.user_id
+    LEFT JOIN ticketing.customer c
+        ON c.customer_id = h.customer_id
     WHERE h.hold_id = p_hold_id;
 
     RETURN v_out;
@@ -243,7 +243,7 @@ CREATE OR REPLACE FUNCTION ticketing.seat_hold_getpagedlist(
     p_offset integer,
     p_keysearch varchar,
     p_event_id bigint,
-    p_user_id bigint,
+    p_customer_id bigint,
     p_status varchar
 )
 RETURNS refcursor
@@ -256,7 +256,7 @@ AS $function$
         p_offset => 0,
         p_keysearch => '',
         p_event_id => -1,
-        p_user_id => -1,
+        p_customer_id => -1,
         p_status => ''
     );
     FETCH ALL IN "seat_hold_getpagedlist";
@@ -280,9 +280,9 @@ BEGIN
             h.event_id,
             e.event_code,
             e.event_name,
-            h.user_id,
-            u.username,
-            u.full_name,
+            h.customer_id,
+            c.email,
+            c.full_name,
             h.status,
             h.hold_started_at,
             h.hold_expires_at,
@@ -292,23 +292,23 @@ BEGIN
         FROM ticketing.seat_hold h
         LEFT JOIN ticketing."event" e
             ON e.event_id = h.event_id
-        LEFT JOIN ticketing.sys_user u
-            ON u.user_id = h.user_id
+        LEFT JOIN ticketing.customer c
+            ON c.customer_id = h.customer_id
         WHERE (
                 trim(coalesce(p_keysearch, '')) = ''
                 OR lower(h.hold_code) LIKE '%' || lower(trim(p_keysearch)) || '%'
                 OR lower(coalesce(e.event_code, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
                 OR lower(coalesce(e.event_name, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
-                OR lower(coalesce(u.username, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
-                OR lower(coalesce(u.full_name, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
+                OR lower(coalesce(c.email, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
+                OR lower(coalesce(c.full_name, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
               )
           AND (
                 p_event_id = -1
                 OR h.event_id = p_event_id
               )
           AND (
-                p_user_id = -1
-                OR h.user_id = p_user_id
+                p_customer_id = -1
+                OR h.customer_id = p_customer_id
               )
           AND (
                 trim(coalesce(p_status, '')) = ''
@@ -349,9 +349,9 @@ BEGIN
         h.event_id,
         e.event_code,
         e.event_name,
-        h.user_id,
-        u.username,
-        u.full_name,
+        h.customer_id,
+        c.email,
+        c.full_name,
         h.status,
         h.hold_started_at,
         h.hold_expires_at,
@@ -361,8 +361,8 @@ BEGIN
     FROM ticketing.seat_hold h
     LEFT JOIN ticketing."event" e
         ON e.event_id = h.event_id
-    LEFT JOIN ticketing.sys_user u
-        ON u.user_id = h.user_id
+    LEFT JOIN ticketing.customer c
+        ON c.customer_id = h.customer_id
     WHERE h.event_id = p_event_id;
 
     RETURN v_out;
@@ -371,20 +371,20 @@ $function$;
 
 
 
-CREATE OR REPLACE FUNCTION ticketing.seat_hold_getbyuserid(
-    p_user_id bigint
+CREATE OR REPLACE FUNCTION ticketing.seat_hold_getbycustomerid(
+    p_customer_id bigint
 )
 RETURNS refcursor
 LANGUAGE plpgsql
 AS $function$
 /*
     BEGIN;
-    SELECT ticketing.seat_hold_getbyuserid(1);
-    FETCH ALL IN "seat_hold_getbyuserid";
+    SELECT ticketing.seat_hold_getbycustomerid(1);
+    FETCH ALL IN "seat_hold_getbycustomerid";
     COMMIT;
 */
 DECLARE
-    v_out refcursor := 'seat_hold_getbyuserid';
+    v_out refcursor := 'seat_hold_getbycustomerid';
 BEGIN
     OPEN v_out FOR
     SELECT
@@ -393,9 +393,9 @@ BEGIN
         h.event_id,
         e.event_code,
         e.event_name,
-        h.user_id,
-        u.username,
-        u.full_name,
+        h.customer_id,
+        c.email,
+        c.full_name,
         h.status,
         h.hold_started_at,
         h.hold_expires_at,
@@ -405,9 +405,9 @@ BEGIN
     FROM ticketing.seat_hold h
     LEFT JOIN ticketing."event" e
         ON e.event_id = h.event_id
-    LEFT JOIN ticketing.sys_user u
-        ON u.user_id = h.user_id
-    WHERE h.user_id = p_user_id;
+    LEFT JOIN ticketing.customer c
+        ON c.customer_id = h.customer_id
+    WHERE h.customer_id = p_customer_id;
 
     RETURN v_out;
 END;

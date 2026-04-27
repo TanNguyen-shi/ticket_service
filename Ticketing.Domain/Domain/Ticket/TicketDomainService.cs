@@ -27,7 +27,7 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
                 ticket_code = entity.ticket_code,
                 order_item_id = entity.order_item_id,
                 event_id = entity.event_id,
-                user_id = entity.user_id,
+                customer_id = entity.customer_id,
                 seat_id = entity.seat_id,
                 seat_label_snapshot = entity.seat_label_snapshot,
                 zone_name_snapshot = entity.zone_name_snapshot,
@@ -57,21 +57,21 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
         {
             await unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            var result = await _repository.UpdateAsync(new
-            {
-                ticket_id = entity.ticket_id,
-                ticket_code = entity.ticket_code,
-                order_item_id = entity.order_item_id,
-                event_id = entity.event_id,
-                user_id = entity.user_id,
-                seat_id = entity.seat_id,
-                seat_label_snapshot = entity.seat_label_snapshot,
-                zone_name_snapshot = entity.zone_name_snapshot,
-                event_name_snapshot = entity.event_name_snapshot,
-                ticket_status = entity.ticket_status,
-                issued_at = entity.issued_at,
-                checked_in_at = entity.checked_in_at
-            }, cancellationToken)!.ToBoolAsync();
+             var result = await _repository.UpdateAsync(new
+             {
+                 ticket_id = entity.ticket_id,
+                 ticket_code = entity.ticket_code,
+                 order_item_id = entity.order_item_id,
+                 event_id = entity.event_id,
+                 customer_id = entity.customer_id,
+                 seat_id = entity.seat_id,
+                 seat_label_snapshot = entity.seat_label_snapshot,
+                 zone_name_snapshot = entity.zone_name_snapshot,
+                 event_name_snapshot = entity.event_name_snapshot,
+                 ticket_status = entity.ticket_status,
+                 issued_at = entity.issued_at,
+                 checked_in_at = entity.checked_in_at
+             }, cancellationToken)!.ToBoolAsync();
 
             if (!result)
                 throw new Exception(DomainMessageConstants.Ticket.UpdateError);
@@ -126,15 +126,15 @@ public class TicketDomainService(ITicketingUnitOfWork unitOfWork)
     {
         try
         {
-            var result = await _repository.GetPagedAsync<TicketListDto>(new
-            {
-                pagesize = request.pagesize,
-                offset = request.offset,
-                keysearch = request.keysearch,
-                event_id = request.event_id,
-                user_id = request.user_id,
-                ticket_status = request.ticket_status
-            }, cancellationToken);
+             var result = await _repository.GetPagedAsync<TicketListDto>(new
+             {
+                 pagesize = request.pagesize,
+                 offset = request.offset,
+                 keysearch = request.keysearch,
+                 event_id = request.event_id,
+                 customer_id = request.customer_id,
+                 ticket_status = request.ticket_status
+             }, cancellationToken);
 
             return new ResponseMessage<IEnumerable<TicketListDto>>().MessageSuccess(result ?? [], DomainMessageConstants.Ticket.GetListSuccess);
         }

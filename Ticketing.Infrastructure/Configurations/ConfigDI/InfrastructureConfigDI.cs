@@ -25,6 +25,7 @@ using Ticketing.Infrastructure.Repositories.SysUserRole;
 using Ticketing.Infrastructure.Repositories.SeatHold;
 using Ticketing.Infrastructure.Repositories.Payment;
 using Ticketing.Infrastructure.Repositories.Idempotency;
+using Ticketing.Infrastructure.Repositories.Customer;
 
 namespace Ticketing.Infrastructure.Configurations.ConfigDI;
 
@@ -123,6 +124,16 @@ public static class InfrastructureConfigDi
 
         //Idempotency Module (Anti-Duplicate Pattern)
         services.AddScoped<IIdempotencyRequestRepository, IdempotencyRequestRepository>();
+
+        //Customer Module (Web Client Users)
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<ICustomerUnitOfWork>(provider =>
+            new CustomerUnitOfWork(
+                provider.GetRequiredService<DapperContext>(),
+                provider.GetRequiredService<DapperContextAccessor>(),
+                provider.GetRequiredService<IDapperProcedureHelper>()
+            )
+        );
 
         services.AddScoped<IJWTTokenService, JwtTokenService>();
 

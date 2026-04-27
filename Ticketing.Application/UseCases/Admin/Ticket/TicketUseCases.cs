@@ -20,7 +20,7 @@ public class TicketUseCases(ITicketDomainService ticketDomain) : ITicketUseCases
                 ticket_code = request.ticket_code,
                 order_item_id = request.order_item_id,
                 event_id = request.event_id,
-                user_id = request.user_id,
+                customer_id = request.customer_id,
                 seat_id = request.seat_id,
                 seat_label_snapshot = request.seat_label_snapshot,
                 zone_name_snapshot = request.zone_name_snapshot,
@@ -52,7 +52,7 @@ public class TicketUseCases(ITicketDomainService ticketDomain) : ITicketUseCases
                 ticket_code = request.ticket_code,
                 order_item_id = request.order_item_id,
                 event_id = request.event_id,
-                user_id = request.user_id,
+                customer_id = request.customer_id,
                 seat_id = request.seat_id,
                 seat_label_snapshot = request.seat_label_snapshot,
                 zone_name_snapshot = request.zone_name_snapshot,
@@ -116,7 +116,7 @@ public class TicketUseCases(ITicketDomainService ticketDomain) : ITicketUseCases
                 offset = request.offset,
                 keysearch = request.keysearch,
                 event_id = request.event_id,
-                user_id = request.user_id,
+                customer_id = request.customer_id,
                 ticket_status = request.ticket_status
             }, cancellationToken);
         }

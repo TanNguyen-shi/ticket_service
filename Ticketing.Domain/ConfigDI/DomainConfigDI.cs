@@ -30,6 +30,8 @@ using Ticketing.Domain.Domain.SysUser;
 using Ticketing.Domain.Domain.SysUser.Interfaces;
 using Ticketing.Domain.Domain.SysUserRole;
 using Ticketing.Domain.Domain.SysUserRole.Interfaces;
+using Ticketing.Domain.Domain.CustomerAuth;
+using Ticketing.Domain.Domain.CustomerAuth.Interfaces;
 
 namespace Ticketing.Domain.ConfigDI;
 
@@ -54,6 +56,7 @@ public static class DomainConfigDI
         services.AddScoped<ISysUserDomainService, SysUserDomainService>();
         services.AddScoped<ISysUserRoleDomainService, SysUserRoleDomainService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICustomerAuthDomainService, CustomerAuthDomainService>();
 
         return services;
     }
