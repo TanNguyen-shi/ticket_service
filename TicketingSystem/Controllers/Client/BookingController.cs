@@ -17,4 +17,11 @@ public class BookingController(IBookingUseCases bookingUseCase, IUserHelper user
         var result = await bookingUseCase.HoldSeat(request, user.UserId ?? 0, cancellationToken);
         return Ok(result);
     }
+
+    [HttpPost("checkout")]
+    public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request, CancellationToken cancellationToken = default)
+    {
+        var result = await bookingUseCase.CheckoutAsync(request, user.UserId ?? 0, cancellationToken);
+        return Ok(result);
+    }
 }

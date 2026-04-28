@@ -36,6 +36,8 @@ using Ticketing.Application.UseCases.Client.Event;
 using Ticketing.Application.UseCases.Client.Event.Interfaces;
 using Ticketing.Application.UseCases.Client.Auth;
 using Ticketing.Application.UseCases.Client.Auth.Interfaces;
+using Ticketing.Application.UseCases.Client.Ticket;
+using Ticketing.Application.UseCases.Client.Ticket.Interfaces;
 
 namespace Ticketing.Application.ConfigDI;
 
@@ -63,6 +65,7 @@ public static class UseCaseConfigureDI
         services.AddScoped<IAuthUseCases, AuthUseCases>();
         services.AddScoped<IBookingUseCases, BookingUseCases>();
         services.AddScoped<IClientAuthUseCases, ClientAuthUseCases>();
+        services.AddScoped<ITicketClientUseCases, TicketClientUseCases>();
 
         return services;
     }

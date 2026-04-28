@@ -11,6 +11,7 @@ namespace Ticketing.Infrastructure.Repositories.SeatHold;
 public interface ISeatHoldItemRepository : IGenericRepository<SeatHoldItemEntity>
 {
     Task<IEnumerable<TResult>> GetByHoldIdAsync<TResult>(object param, CancellationToken cancellationToken = default);
+    Task UpdateStatusByHoldIdAsync(object param, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -25,15 +26,24 @@ public class SeatHoldItemRepository(
     protected override string Schema => "ticketing";
     protected override string TableName => "seat_hold_item";
 
-    /// <summary>
-    /// Get all seat hold items by hold ID
-    /// </summary>
     public async Task<IEnumerable<TResult>> GetByHoldIdAsync<TResult>(
         object param,
         CancellationToken cancellationToken = default)
     {
         var spName = GetSpName("getbyholdid");
         return await _dapper.GetAllAsync<TResult>(
+            Connection,
+            spName,
+            param?.ToParameterArray(),
+            30,
+            Transaction,
+            cancellationToken);
+    }
+
+    public async Task UpdateStatusByHoldIdAsync(object param, CancellationToken cancellationToken = default)
+    {
+        var spName = GetSpName("updatestatusbyholdid");
+        await _dapper.ExecStoreToStringAsync(
             Connection,
             spName,
             param?.ToParameterArray(),
