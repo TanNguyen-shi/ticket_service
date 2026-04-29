@@ -35,6 +35,8 @@ TicketingSystem/                          # Root solution
 │   ├── Controllers/
 │   │   ├── Admin/                       # Admin endpoints
 │   │   └── Client/                      # Client/public endpoints
+│   ├── BackgroundServices/              # IHostedService implementations
+│   │   └── SeatHoldExpiryBackgroundService.cs  # Releases expired holds every 60s
 │   ├── Middleware/                      # ExceptionHandlingMiddleware
 │   ├── Configures/                      # Reserved for future configs
 │   └── docs/                            # API documentation
@@ -128,9 +130,18 @@ PostgreSQL Database
 - **DapperContextAccessor**: Scoped context holder (connection + transaction)
 - **DapperProcedureHelper**: Executes stored procedures, handles refcursor
 - **Repository<TEntity>**: Generic CRUD operations via stored procedures
-- **UnitOfWork**: Transaction management
+- **UnitOfWork**: Transaction management (`CommitAsync`/`RollbackAsync` both call `CloseAsync`, clearing `DapperContextAccessor`)
 - **ICacheService**: Redis integration
 - **IUserHelper**: Extracts user info from JWT claims
+- **SeatHoldExpiryBackgroundService**: Singleton `IHostedService`, runs every 60s, creates a DI scope per run to resolve scoped `IBookingUseCases` and release expired holds
+
+### Booking Module Notes
+
+- **Idempotency key**: Client-generated UUID, scoped server-side as `hold-evt{event_id}_cust{customerId}_{uuid}` to prevent cross-customer collision
+- **Idempotency record states**: `processing` → `completed` (with `response_snapshot`) or `failed`; retry allowed for `failed`, expired `processing`, or broken `completed`
+- **`response_snapshot` field**: Always use `string.Empty` (never `null`) — Npgsql cannot infer PostgreSQL type from `DBNull.Value`
+- **Checkout payment**: Mock only — no real payment gateway; order is created in `paid` status immediately
+- **Background release isolation**: Each expired hold is released in its own transaction via `ProcessExpiredRelease`; failure of one hold does not block others because `RollbackAsync` closes and clears the connection
 
 ---
 
@@ -175,7 +186,9 @@ DI registration files:
 - `Ticketing.Application/ConfigDI/UseCaseConfigureDI.cs`
 - `Ticketing.Domain/ConfigDI/DomainConfigDI.cs`
 
-All registered as **Scoped** (per HTTP request) except DapperContext (Singleton).
+All registered as **Scoped** (per HTTP request) except:
+- **DapperContext** — Singleton
+- **SeatHoldExpiryBackgroundService** — Singleton (`AddHostedService`); uses `IServiceScopeFactory` to resolve scoped dependencies per run
 
 ### Authentication
 

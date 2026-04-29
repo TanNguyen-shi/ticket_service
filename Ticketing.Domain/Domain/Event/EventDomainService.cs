@@ -368,8 +368,8 @@ public class EventDomainService(
                     .GroupBy(p => p.event_zone_id)
                     .ToDictionary(g => g.Key, g => g.ToList());
 
-                // ⚡ Populate zones - gọi DateTime.UtcNow 1 lần
-                var now = DateTime.UtcNow;
+                // ⚡ Populate zones - gọi DateTime.Now 1 lần
+                var now = DateTime.Now;
 
                 foreach (var zone in zones)
                 {

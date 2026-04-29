@@ -29,3 +29,11 @@ public class SeatHoldItemForCheckoutDto
     public string zone_name_snapshot { get; set; } = string.Empty;
     public string status { get; set; } = string.Empty;
 }
+
+/// <summary>
+/// Chỉ chứa hold_id — dùng cho truy vấn các phiên giữ chỗ đã hết hạn trong background job
+/// </summary>
+public class ExpiredHoldDto
+{
+    public long hold_id { get; set; }
+}

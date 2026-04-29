@@ -34,13 +34,13 @@ public class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJWTTokenService
             key,
             SecurityAlgorithms.HmacSha256);
 
-        var expireAt = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpireMinutes);
+        var expireAt = DateTime.Now.AddMinutes(_jwtOptions.ExpireMinutes);
 
         var token = new JwtSecurityToken(
             issuer: _jwtOptions.Issuer,
             audience: _jwtOptions.Audience,
             claims: claims,
-            notBefore: DateTime.UtcNow,
+            notBefore: DateTime.Now,
             expires: expireAt,
             signingCredentials: credentials
         );
@@ -50,7 +50,7 @@ public class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJWTTokenService
 
     public DateTime GetExpireAt()
     {
-        return DateTime.UtcNow.AddMinutes(_jwtOptions.ExpireMinutes);
+        return DateTime.Now.AddMinutes(_jwtOptions.ExpireMinutes);
     }
 
     public int GetExpireInSeconds()

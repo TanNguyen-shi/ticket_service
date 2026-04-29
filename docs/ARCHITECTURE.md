@@ -107,11 +107,11 @@
 #### 3. **Seat Hold & Inventory**
 - **Seat Inventory**: Real-time seat status (available/held/sold)
 - **Seat Hold**: 10-minute reserve per user per event
-- **Idempotency**: Prevent double-hold via idempotency key + request hash
+- **Idempotency**: Prevent double-hold via idempotency key (scoped per event+customer) + request hash validation
 - **Entities**: EventSeatInventory, SeatHold, SeatHoldItem, IdempotencyRequest
-- **Domain Service**: Orchestrates hold flow, coordinates with Payment module
-- **Use Cases**: IBookingUseCases (client-side holds)
-- **Locking**: Redis distributed locks per seat (prevent race conditions)
+- **Use Cases**: IBookingUseCases (HoldSeat, Checkout, ReleaseHold, ReleaseExpiredHolds)
+- **Background Job**: SeatHoldExpiryBackgroundService — runs every 60s, releases holds expired > 10 min
+- **Concurrency**: Optimistic locking on EventSeatInventory via `version` field
 
 #### 4. **Order & Ticket**
 - **Ticket Order**: Group of seats + total price
@@ -205,81 +205,102 @@ EventUseCases.InsertAsync(request, userId, cancellationToken)
     └─ HTTP 200 OK with ResponseMessage<int>
 ```
 
-### 2. Client Holds Seats (Complex Flow)
+### 2. Client Holds Seat (Complex Flow)
 
 ```
-BookingController.HoldSeats(HoldSeatsRequest)
+BookingController.HoldSeat(BookingHoldSeatRequest)
   ├─ Extract user_id from JWT
-  └─ Call BookingUseCases.HoldSeatsAsync(request, userId, cancellationToken)
-    ├─ Validate request (seat_ids not empty, event exists)
-    ├─ Calculate request_hash (userId + eventId + sorted_seat_ids)
-    ├─ Check IdempotencyRequest (prevent double-click)
-    │  ├─ If exists + status=completed → return cached response
-    │  ├─ If exists + status=processing → return "already processing" error
-    │  ├─ If exists + status=failed → allow retry (new request)
-    │  └─ If not exists → create new record with status=processing
-    ├─ Acquire Redis locks for each seat (lock:event:{eventId}:seat:{seatId})
-    │  └─ If any lock fails → release all, return error
-    ├─ Call EventDomainService.HoldSeatsAsync(...)
+  └─ Call BookingUseCases.HoldSeat(request, customerId, cancellationToken)
+    │
+    ├─ [IDEMPOTENCY GUARD]
+    │  ├─ Build scoped key: "hold-evt{event_id}_cust{customerId}_{client_uuid}"
+    │  ├─ Hash entire request payload (SHA-256) → request_hash
+    │  ├─ Lookup existing IdempotencyRequest by key
+    │  │
+    │  ├─ If exists:
+    │  │  ├─ Hash mismatch → return error (key reused for different payload)
+    │  │  ├─ status=completed + snapshot valid → return cached response
+    │  │  ├─ status=processing + not expired → return "already processing" error
+    │  │  └─ status=failed / processing+expired / completed+broken snapshot
+    │  │       → UpdateAsync existing record → reset to status=processing
+    │  │
+    │  └─ If not exists → InsertAsync new record with status=processing, expired_at=+10min
+    │
+    ├─ [PROCESS HOLD — ProcessHoldSeat()]
     │  ├─ Open connection
+    │  ├─ Query EventSeatInventory for requested seat_ids (verify all available)
     │  ├─ Begin transaction
+    │  ├─ Insert SeatHold (hold_code, event_id, customer_id, status=active, expires=+10min)
     │  ├─ For each seat:
-    │  │  ├─ Insert SeatHoldItem (hold_id, seat_id, price_at_hold, ...)
-    │  │  ├─ Update EventSeatInventory (optimistic lock: status=available → held)
-    │  ├─ Commit transaction
-    │  ├─ Update IdempotencyRequest (status=completed, response_snapshot=hold_id)
-    │  ├─ Schedule auto-expire job (10 minutes)
-    │  └─ Broadcast SeatHeld via SignalR (event group)
-    └─ Return HoldSeatsResponse with hold_id, hold_code, expires_at
-      └─ HTTP 200 OK
+    │  │  ├─ Insert SeatHoldItem (hold_id, seat_id, price_at_hold, seat_label_snapshot, ...)
+    │  │  └─ UpdateHoldAsync on EventSeatInventory (available→held, optimistic lock via version)
+    │  └─ Commit transaction
+    │
+    ├─ Update IdempotencyRequest → status=completed + response_snapshot (JSON)
+    │                           or status=failed on error
+    └─ Return BookingHoldSeatDto with hold_id, hold_expires_at, held_seats[]
 ```
 
-### 3. Client Checkout (After Hold)
+### 3. Client Release Hold (Manual Cancel)
+
+```
+BookingController.ReleaseHold(holdId)
+  ├─ Extract user_id from JWT
+  └─ Call BookingUseCases.ReleaseHoldAsync(holdId, customerId, cancellationToken)
+    ├─ Validate: hold exists, customer_id matches, status=active
+    ├─ Load SeatHoldItems for the hold
+    ├─ Begin transaction
+    ├─ For each item: UpdateReleaseAsync on EventSeatInventory (held→available, version++)
+    ├─ UpdateStatusByHoldIdAsync on SeatHoldItem → status=released (bulk)
+    ├─ UpdateAsync on SeatHold → status=released, released_at=now, release_reason="Khách hàng huỷ"
+    └─ Commit → return ReleaseHoldResponseDto
+```
+
+### 4. Client Checkout (After Hold)
+
+Payment is currently **mock** — no external gateway is called. Checkout creates order + tickets immediately in `paid` status.
 
 ```
 BookingController.Checkout(CheckoutRequest)
-  ├─ Validate hold still valid
-  ├─ Check hold hasn't expired
-  ├─ Convert SeatHold to TicketOrder
-  │  ├─ Create TicketOrder (hold_id → order_id, calculate total_price)
-  │  ├─ For each SeatHoldItem:
-  │  │  └─ Create TicketOrderItem
-  │  ├─ Mark SeatHold as converted
-  │  └─ Update EventSeatInventory (held → sold)
-  └─ Initiate payment flow
-    ├─ Create PaymentTransaction (status=pending)
-    └─ Return payment gateway URL
-```
-
-### 4. Payment Callback (From Provider)
-
-```
-PaymentCallbackController.Callback(CallbackPayload)
-  ├─ Verify callback signature
-  ├─ Log in PaymentCallbackLog (received, not yet processed)
-  ├─ Check IdempotencyRequest (prevent duplicate processing)
-  ├─ Update PaymentTransaction (success/failed)
-  ├─ If success:
-  │  ├─ Update TicketOrder (status=confirmed)
-  │  ├─ Create Ticket records for each order item
-  │  ├─ Update EventSeatInventory (complete transition)
-  │  └─ Send confirmation email
-  ├─ Update IdempotencyRequest (status=completed)
-  └─ Return 200 OK (webhook acknowledgment)
-```
-
-### 5. Seat Hold Auto-Expire (Scheduled Job)
-
-```
-SeatHoldExpirationJob.Execute(hold_id)
-  ├─ Check if SeatHold.hold_expires_at <= now()
-  ├─ Mark SeatHold as expired
+  ├─ Validate: customerId, hold_id > 0
+  ├─ Load SeatHold (verify owner, status=active, not expired)
+  ├─ Load SeatHoldItems
+  ├─ Begin transaction
+  ├─ Insert TicketOrder (order_code, total_amount, order_status=paid, paid_at=now)
   ├─ For each SeatHoldItem:
-  │  ├─ Mark as expired
-  │  ├─ Update EventSeatInventory (held → available, version++)
-  │  └─ Release Redis lock
-  └─ Broadcast SeatReleased via SignalR
+  │  ├─ Insert TicketOrderItem (order_id, seat, unit_price, item_status=paid)
+  │  ├─ UpdateOrderAsync on EventSeatInventory (held→sold)
+  │  └─ Insert Ticket (ticket_code, customer_id, seat_label_snapshot, ticket_status=active)
+  ├─ UpdateAsync SeatHold → status=converted
+  ├─ UpdateStatusByHoldIdAsync SeatHoldItem → status=converted (bulk)
+  ├─ Insert PaymentTransaction (payment_provider=mock, payment_status=success)
+  └─ Commit → return CheckoutResponseDto with order_id, order_code, final_amount, tickets[]
 ```
+
+### 5. Seat Hold Auto-Expire (Background Service)
+
+`SeatHoldExpiryBackgroundService` runs as a singleton `IHostedService`, iterating every **60 seconds**.
+Each iteration creates a fresh DI scope to resolve the scoped `IBookingUseCases`.
+
+```
+SeatHoldExpiryBackgroundService.ExecuteAsync (every 60s)
+  └─ Create DI scope → resolve IBookingUseCases
+     └─ BookingUseCases.ReleaseExpiredHoldsAsync()
+       ├─ Query seat_hold WHERE status='active' AND hold_expires_at < now()
+       └─ For each expired hold (in isolation):
+            BookingUseCases.ProcessExpiredRelease(holdId)
+              ├─ [OUTSIDE transaction] Read SeatHold + SeatHoldItems
+              ├─ Guard: skip if hold is no longer active (already released by another path)
+              ├─ Begin transaction
+              ├─ For each item: UpdateReleaseAsync on EventSeatInventory (held→available)
+              ├─ UpdateStatusByHoldIdAsync SeatHoldItem → status=released (bulk)
+              ├─ UpdateAsync SeatHold → status=released, release_reason="Hết hạn (10 phút)"
+              ├─ Commit (clears connection via CloseAsync)
+              └─ On error: RollbackAsync (clears connection) → throw
+                   └─ Caller catches, continues with next hold
+```
+
+**Key design decision**: reads happen *outside* the try/catch, transaction wraps only writes. `RollbackAsync` calls `CloseAsync` which clears `DapperContextAccessor`, so the next iteration always gets a clean connection even after a failure.
 
 ---
 

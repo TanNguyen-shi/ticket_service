@@ -16,6 +16,11 @@ public interface IEventSeatInventoryRepository : IGenericRepository<EventSeatInv
     Task<string?> UpdateHoldAsync<TParam>(
         TParam dto,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Reset ghế từ "held" → "available" khi phiên giữ chỗ bị huỷ hoặc hết hạn.
+    /// </summary>
+    Task UpdateReleaseAsync<TParam>(TParam dto, CancellationToken cancellationToken = default);
 }
 
 public class EventSeatInventoryRepository(
@@ -74,6 +79,19 @@ public class EventSeatInventoryRepository(
         var spName = GetSpName("updateorder");
 
         return await _dapper.ExecStoreToStringAsync(
+            Connection,
+            spName,
+            dto?.ToParameterArray(),
+            30,
+            Transaction,
+            cancellationToken);
+    }
+
+    public async Task UpdateReleaseAsync<TParam>(TParam dto, CancellationToken cancellationToken = default)
+    {
+        var spName = GetSpName("update_release");
+
+        await _dapper.ExecStoreToStringAsync(
             Connection,
             spName,
             dto?.ToParameterArray(),

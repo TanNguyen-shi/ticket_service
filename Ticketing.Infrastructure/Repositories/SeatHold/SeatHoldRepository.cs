@@ -12,6 +12,12 @@ public interface ISeatHoldRepository : IGenericRepository<SeatHoldEntity>
 {
     Task<IEnumerable<TResult>> GetByEventIdAsync<TResult>(object param, CancellationToken cancellationToken = default);
     Task<IEnumerable<TResult>> GetByUserIdAsync<TResult>(object param, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lấy danh sách hold_id của các phiên giữ chỗ đang active nhưng đã hết hạn.
+    /// Dùng cho background job tự động nhả ghế.
+    /// </summary>
+    Task<IEnumerable<TResult>> GetExpiredActiveAsync<TResult>(CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -55,6 +61,18 @@ public class SeatHoldRepository(
             Connection,
             spName,
             param?.ToParameterArray(),
+            30,
+            Transaction,
+            cancellationToken);
+    }
+
+    public async Task<IEnumerable<TResult>> GetExpiredActiveAsync<TResult>(CancellationToken cancellationToken = default)
+    {
+        var spName = GetSpName("getexpiredactive");
+        return await _dapper.GetAllAsync<TResult>(
+            Connection,
+            spName,
+            parameters: null,
             30,
             Transaction,
             cancellationToken);

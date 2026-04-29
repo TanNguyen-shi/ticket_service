@@ -533,17 +533,71 @@ GET /api/client/event/{eventId}
 
 ### Booking (Seat Hold)
 
-#### Hold Seats (10-minute reserve)
+#### Hold Seat (10-minute reserve)
+
+Client phải tự sinh một UUID (`idempotency_key`) trước mỗi lần gọi. Nếu request bị timeout, retry với cùng key sẽ nhận lại kết quả cũ thay vì tạo phiên mới.
+
 ```http
-POST /api/client/booking/hold-seats
+POST /api/client/booking/hold-seat
 Authorization: Bearer <token>
 Content-Type: application/json
-Idempotency-Key: "hold-event123-user1-001"
 
 {
   "event_id": 123,
-  "seat_ids": [1001, 1002, 1003]
+  "seat_ids": [1001, 1002, 1003],
+  "idempotency_key": "550e8400-e29b-41d4-a716-446655440000"
 }
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event_id` | long | ID của sự kiện |
+| `seat_ids` | long[] | Danh sách seat_id muốn giữ |
+| `idempotency_key` | string (UUID) | Client tự sinh, dùng để detect retry |
+
+**Response** (200 OK — success):
+```json
+{
+  "issuccess": true,
+  "status": "success",
+  "message": "Giữ chỗ thành công",
+  "data": {
+    "hold_id": 500,
+    "event_id": 123,
+    "hold_started_at": "2026-05-15T14:05:30.000Z",
+    "hold_expires_at": "2026-05-15T14:15:30.000Z",
+    "held_seats": [
+      { "event_seat_inventory_id": 2001, "seat_hold_item_id": 301 },
+      { "event_seat_inventory_id": 2002, "seat_hold_item_id": 302 }
+    ]
+  }
+}
+```
+
+**Response** (200 OK — idempotency retry):
+```json
+{
+  "issuccess": true,
+  "status": "success",
+  "message": "Yêu cầu đã được xử lý trước đó",
+  "data": { ... }
+}
+```
+
+**Response** (200 OK — error cases):
+```json
+{ "issuccess": false, "status": "error", "message": "Ghế A-01, A-02 không còn trống, vui lòng chọn ghế khác" }
+{ "issuccess": false, "status": "error", "message": "Yêu cầu đang được xử lý, vui lòng thử lại sau ít giây" }
+{ "issuccess": false, "status": "error", "message": "Idempotency key này đã được sử dụng cho một yêu cầu khác, vui lòng dùng key mới" }
+```
+
+#### Release Hold (Client Cancel)
+
+Client bấm "Quay lại" từ trang checkout → nhả toàn bộ ghế về `available`.
+
+```http
+DELETE /api/client/booking/release/{holdId}
+Authorization: Bearer <token>
 ```
 
 **Response** (200 OK):
@@ -551,18 +605,19 @@ Idempotency-Key: "hold-event123-user1-001"
 {
   "issuccess": true,
   "status": "success",
-  "message": "Giữ ghế thành công. Vui lòng hoàn tất thanh toán trong 10 phút",
+  "message": "Huỷ giữ chỗ thành công",
   "data": {
     "hold_id": 500,
-    "hold_code": "HOLD-abc123def456",
-    "expires_at": "2026-05-15T14:15:30.000Z",
-    "total_price": 1500000,
-    "seats_held": 3
+    "release_reason": "Khách hàng huỷ giữ chỗ",
+    "released_at": "2026-05-15T14:10:00.000Z"
   }
 }
 ```
 
 #### Checkout (Convert Hold to Order)
+
+Payment hiện là **mock** — không gọi payment gateway thực. Checkout thành công là đơn hàng được tạo ngay ở trạng thái `paid` và vé được phát hành luôn.
+
 ```http
 POST /api/client/booking/checkout
 Authorization: Bearer <token>
@@ -578,42 +633,38 @@ Content-Type: application/json
 {
   "issuccess": true,
   "status": "success",
-  "message": "Tạo đơn hàng thành công",
+  "message": "Thanh toán thành công",
   "data": {
     "order_id": 700,
-    "order_code": "ORD-2026-001234",
-    "total_price": 1500000,
-    "payment_url": "https://payment-gateway.com/pay?ref=abc123",
-    "payment_deadline": "2026-05-15T14:25:30.000Z"
+    "order_code": "ORDER-A1B2C3D4E5F6G7H8",
+    "event_id": 123,
+    "event_name": "Sky Tour Live Concert",
+    "final_amount": 1500000,
+    "paid_at": "2026-05-15T14:10:30.000Z",
+    "tickets": [
+      {
+        "ticket_id": 1,
+        "ticket_code": "TKT-A1B2C3D4E5F6G7H8",
+        "seat_label": "A-01",
+        "zone_name": "Sân khấu",
+        "price": 500000
+      }
+    ]
   }
 }
 ```
 
----
+#### [DEV ONLY] Trigger Expire Job
 
-### Payment Callback (From Payment Provider)
+Kích hoạt thủ công job nhả ghế hết hạn — chỉ dùng để test, xoá trước khi lên production.
 
-#### Payment Confirmation
 ```http
-POST /api/client/payment/callback
-Content-Type: application/json
-
-{
-  "payment_ref": "PAY-abc123",
-  "provider_transaction_ref": "VNPAY_TXN_001",
-  "payment_status": "success",
-  "amount": 1500000,
-  "signature": "signature_hash_from_provider"
-}
+POST /api/client/booking/dev/trigger-expire
 ```
 
 **Response** (200 OK):
 ```json
-{
-  "issuccess": true,
-  "status": "success",
-  "message": "Xác nhận thanh toán thành công"
-}
+{ "message": "Đã kích hoạt release expired holds" }
 ```
 
 ---
@@ -789,7 +840,7 @@ Content-Type: application/json
   - Event details cached 5 minutes
   - Client event lists cached 3 minutes
   - Use `Cache-Control` headers in production
-- **Idempotency**: Use `Idempotency-Key` header for POST requests to prevent duplicates
+- **Idempotency**: Pass `idempotency_key` (UUID) in request body for `hold-seat` to prevent double-holds on retry
 - **Timeouts**: 30-second timeout on all database operations
 
 ---

@@ -10,6 +10,7 @@ using Ticketing.Domain.ConfigDI;
 using Ticketing.Infrastructure.Configurations.ConfigDI;
 using Ticketing.Infrastructure.Extensions;
 using Ticketing.Infrastructure.JWT.Model;
+using TicketingSystem.BackgroundServices;
 using TicketingSystem.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,7 @@ builder.Host.UseSerilog();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddUseCaseService(builder.Configuration);
 builder.Services.AddDomainServices(builder.Configuration);
+builder.Services.AddHostedService<SeatHoldExpiryBackgroundService>();
 builder.Services.AddEndpointsApiExplorer();
 
 const string LocalFrontendCorsPolicy = "LocalFrontendPolicy";
