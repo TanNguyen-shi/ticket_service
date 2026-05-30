@@ -350,8 +350,8 @@ BEGIN
                 OR lower(coalesce(o.order_code, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
                 OR lower(coalesce(e.event_code, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
                 OR lower(coalesce(e.event_name, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
-                OR lower(coalesce(u.username, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
-                OR lower(coalesce(u.full_name, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
+                OR lower(coalesce(c.username, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
+                OR lower(coalesce(c.full_name, '')) LIKE '%' || lower(trim(p_keysearch)) || '%'
               )
           AND (
                 p_order_id = -1

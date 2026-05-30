@@ -34,7 +34,7 @@ public class EventZoneSectionRepository(
     
     public async Task<IEnumerable<TResult>> GetByEventId<TResult>(object param, CancellationToken cancellationToken = default)
     {
-        var spName = GetSpName("geteventid");
+        var spName = GetSpName("getbyeventid");
         return await _dapper.GetAllAsync<TResult>(
             Connection,
             spName,

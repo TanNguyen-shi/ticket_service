@@ -138,18 +138,22 @@ End-user accounts (tách biệt với sys_user dành cho admin/staff).
 |--------|------|-------------|---------|
 | customer_id | BIGSERIAL | PK | |
 | customer_code | VARCHAR(50) | UNIQUE, NOT NULL | Mã khách hàng |
-| username | VARCHAR(50) | UNIQUE (partial), NOT NULL | Login username |
+| username | VARCHAR(50) | UNIQUE (hard + partial), NOT NULL | Login username |
 | email | VARCHAR(100) | UNIQUE (partial), NULLABLE | |
 | phone | VARCHAR(20) | NULLABLE | |
 | password_hash | VARCHAR(255) | NOT NULL | |
 | full_name | VARCHAR(100) | NOT NULL | |
 | avatar_url | VARCHAR(255) | NULLABLE | |
 | status | VARCHAR(20) | DEFAULT 'active', NOT NULL | `'active'`, `'inactive'` |
-| email_verified | BOOLEAN | DEFAULT false | |
+| email_verified | BOOLEAN | DEFAULT false, NULLABLE | |
 | last_login_at | TIMESTAMP | NULLABLE | |
 | created_at | TIMESTAMP | DEFAULT now() | |
 | updated_at | TIMESTAMP | NULLABLE | |
 | is_deleted | BOOLEAN | DEFAULT false | |
+
+**Constraints**:
+- `customer_username_key` — UNIQUE (username) — **không phải partial**, tức là username của customer bị xóa mềm vẫn không thể tái sử dụng.
+- `customer_customer_code_key` — UNIQUE (customer_code)
 
 **Indexes**:
 - `idx_customer_status` on `(status)`
@@ -437,9 +441,11 @@ Ghế riêng lẻ trong một hold.
 | status | VARCHAR(20) | NOT NULL | `'active'`, `'released'`, `'converted'`, `'expired'` |
 | created_at | TIMESTAMP(3) | DEFAULT now() | |
 
+> **⚠️ Lưu ý**: Bảng này **không có** `is_deleted` và `updated_at`. Stored proc `seat_hold_item_updatestatusbyholdid` trong `checkout_functions.sql` đang SET cả hai cột này — là bug cần fix.
+
 **Check Constraints**: `status` ∈ `{active, released, converted, expired}`, `price_at_hold >= 0`
 
-**Unique Constraint**: `UNIQUE (hold_id, event_seat_inventory_id)`
+**Unique Index**: `ux_seat_hold_item_hold_inventory` on `(hold_id, event_seat_inventory_id)`
 
 **Indexes**:
 - `ix_seat_hold_item_hold_id` on `(hold_id)`
@@ -736,3 +742,69 @@ $function$;
 - `delete(id, updated_by)` → Returns refcursor with `{table}_id`
 - `getbyid(id)` → Returns refcursor with full row + joined details
 - `getpagedlist(pagesize, offset, filters)` → Returns refcursor with rows + `row_index`, `row_total`
+
+---
+
+## Known Issues & Gaps (cần xử lý)
+
+### Repo SQL files lạc hậu so với DB thực tế
+
+Các stored proc trong DB đã được cải thiện (dùng UUID-based cursor name để tránh conflict khi concurrent), nhưng file `.sql` trong repo chưa được cập nhật. Cần sync lại:
+
+| File trong repo | Tình trạng |
+|----------------|-----------|
+| `checkout_functions.sql` | Cũ: hardcoded cursor name, có bug `updated_at`/`is_deleted` (đã fixed trong DB) |
+| Nhiều stored procs khác | Chỉ tồn tại trong DB, chưa commit vào repo |
+
+**Cursor name convention trong DB (đúng)**:
+```sql
+v_out refcursor := 'event_seat_inventory_getbyid_' || replace(gen_random_uuid()::text, '-', '_');
+```
+
+### Bugs trong stored procs (cần fix)
+
+**1. `event_seat_inventory_getbyid` và `event_seat_inventory_getpagedlist`** — tham chiếu `toi.order_item_code` không tồn tại trong `ticket_order_item`:
+```sql
+-- ❌ ticket_order_item không có cột order_item_code
+toi.order_item_code,
+```
+Xử lý: xóa dòng đó hoặc thay bằng `toi.order_item_id::text`.
+
+**2. `payment_transaction_getpagedlist`** — tham chiếu alias `u` không được JOIN, phải là alias `c`:
+```sql
+-- ❌ Bug: alias u không tồn tại, phải là c
+OR lower(coalesce(u.username, '')) LIKE ...
+OR lower(coalesce(u.full_name, '')) LIKE ...
+```
+
+**3. `event_publish_log_getbyid` và `getpagedlist`** — tham chiếu `su.fullname` (thiếu underscore), cột thực tế là `full_name`:
+```sql
+-- ❌ Bug: thiếu underscore
+su.fullname AS changed_by_name
+-- ✅ Đúng
+su.full_name AS changed_by_name
+```
+
+### Naming mismatch: `event_zone_section`
+
+Stored proc trong DB tên là `event_zone_section_geteventid` nhưng `event_zone_section_functions.sql` (repo) và C# Repository dùng `event_zone_section_getbyeventid`. Cần thống nhất:
+- Hoặc rename stored proc: `geteventid` → `getbyeventid`
+- Hoặc update C# code để gọi đúng tên
+
+### Thiếu controller cho 2 module
+
+Tất cả stored procs đã tồn tại trong DB. Chỉ thiếu tầng C# để expose qua API:
+
+| Module | Stored Procs | Thiếu |
+|--------|-------------|-------|
+| `EventZoneSection` | ✅ Đầy đủ (`insert`, `update`, `delete`, `getbyid`, `getbyeventzoneid`, `geteventid`, `getpagedlist`) | Domain Service + UseCase + Controller |
+| `EventSeatInventory` | ✅ Đầy đủ (`insert`, `update`, `delete`, `getbyid`, `getbyseatids`, `update_hold`, `updateorder`, `update_release`, `getpagedlist`) | Controller; **không có** bulk generate |
+
+### Thiếu stored proc: `event_seat_inventory_generate`
+
+Hiện tại admin phải insert từng ghế một (n ghế = n API calls). Cần thêm stored proc bulk generate:
+```sql
+-- Tự động tạo inventory cho toàn bộ ghế của 1 event
+-- dựa trên event_zone_section → venue_seat + event_zone_price
+event_seat_inventory_generate(p_event_id bigint)
+```
