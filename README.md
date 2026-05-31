@@ -1,105 +1,226 @@
-# TicketingSystem - Backend Ticket Service
+# Ticketing System — Backend API
 
-Backend service cho do an tot nghiep, cung cap API quan ly he thong ban ve su kien (event ticketing).
+Hệ thống đặt vé sự kiện trực tuyến với khả năng chịu tải đồng thời cao.  
+Xây dựng bằng **.NET 8**, **PostgreSQL**, **Redis**, theo kiến trúc **Clean Architecture**.
 
-## Muc tieu du an
+**Sinh viên**: Nguyễn Thiện Tân — 25410129  
+**CBHD**: ThS. Mai Xuân Hùng
 
-- Xay dung API theo kien truc tach lop ro rang.
-- Ho tro luong CRUD cho cac module nghiep vu ve su kien, dia diem, don hang va ve.
-- Dong nhat response API va co san co che xac thuc JWT.
+---
 
-## Kien truc tong quan
+## Yêu Cầu
 
-Du an su dung flow:
+| Công cụ | Phiên bản |
+|---------|-----------|
+| .NET SDK | 8.0.x |
+| Docker Desktop | 4.x+ |
+| Git | Bất kỳ |
 
-`Controller -> UseCase -> Domain -> Repository -> PostgreSQL Function`
+---
 
-Cac layer chinh:
+## Cài Đặt Nhanh
 
-- `TicketingSystem/`: Web API (Program, Controller, Middleware, Swagger, Auth).
-- `Ticketing.Application/`: Application use case (dieu phoi luong xu ly).
-- `Ticketing.Domain/`: Domain service (xu ly nghiep vu, transaction boundary).
-- `Ticketing.Infrastructure/`: Repository, UnitOfWork, Dapper helper, JWT service, DTO/Entity.
-
-## Cau truc solution
-
-- `TicketingSystem.sln`: Solution chinh.
-- `global.json`: Khoa SDK .NET (`8.0.0`, roll-forward minor).
-- `TicketingSystem/appsettings.Development.json`: Cau hinh local (PostgreSQL + JWT).
-- `TicketingSystem/docs/ARCHITECTURE_NOTE.md`: Ghi chu onboarding kien truc.
-- `TicketingSystem/docs/CRUD_CODEGEN_GUIDE.md`: Huong dan sinh CRUD theo convention project.
-
-## Module nghiep vu hien co
-
-Mot so module dang co trong source:
-
-- `Auth`
-- `Venue`, `VenueSection`, `VenueSeat`
-- `Event`, `EventZone`, `EventSeatInventory`, `EventPublishLog`
-- `TicketOrder`, `TicketOrderItem`, `Ticket`
-
-## Cong nghe su dung
-
-- `.NET 8` (ASP.NET Core Web API)
-- `PostgreSQL`
-- `Dapper`
-- `JWT Bearer Authentication`
-- `Serilog`
-- `Swagger/OpenAPI`
-
-## Dieu kien can
-
-- .NET SDK 8.x
-- PostgreSQL (local hoac container)
-- (Tuy chon) Docker + Docker Compose
-
-## Chay local
-
-Tu thu muc goc repo:
+### 1. Clone repo
 
 ```bash
-cd "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem"
-dotnet restore "TicketingSystem.sln"
-dotnet build "TicketingSystem.sln"
-dotnet run --project "TicketingSystem/TicketingSystem.csproj"
+git clone <repository-url>
+cd TicketingSystem
 ```
 
-Mac dinh profile Development mo Swagger tai:
-
-- `http://localhost:5025/swagger`
-- hoac `https://localhost:7267/swagger`
-
-## Chay bang Docker
-
-File compose dang nam trong `TicketingSystem/Docker/docker-compose.yml`.
+### 2. Khởi động PostgreSQL + Redis
 
 ```bash
-cd "/Users/tanit/UIT/HK3/Project_Web_DoAnTN/TicketingSystem/TicketingSystem/Docker"
-docker compose --env-file .env up -d --build
+cd TicketingSystem/Docker
+
+# Tạo file .env
+echo "POSTGRES_DB=ticketing_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres123" > .env
+
+# Chạy containers
+docker-compose up -d
 ```
 
-Service API map cong:
+Chờ PostgreSQL `healthy` (khoảng 15 giây):
 
-- `http://localhost:5000`
+```bash
+docker ps   # STATUS phải là "Up (healthy)"
+```
 
-## Auth va API docs
+### 3. Khởi tạo database
 
-- Swagger duoc bat trong moi truong Development.
-- API su dung JWT Bearer.
-- Cau hinh JWT trong `TicketingSystem/appsettings.Development.json` (`Issuer`, `Audience`, `SecretKey`, `ExpireMinutes`).
+```bash
+# Từ thư mục gốc TicketingSystem/
 
-## Quy uoc phat trien
+# Schema (tables, indexes, constraints)
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/ticketing_schema.sql
 
-- Dat ten module theo PascalCase, field DTO/Entity theo snake_case de map DB truc tiep.
-- Luu y hieu nang voi pattern goi PostgreSQL FUNCTION theo convention `schema.table_action`.
-- Tham khao them tai:
-  - `TicketingSystem/docs/ARCHITECTURE_NOTE.md`
-  - `TicketingSystem/docs/CRUD_CODEGEN_GUIDE.md`
+# Stored functions
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/functions/customer_functions.sql
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/functions/event_zone_section_functions.sql
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/functions/event_seat_inventory_functions.sql
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/functions/event_publish_log_functions.sql
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/functions/idempotency_functions.sql
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/functions/seat_hold_functions.sql
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/functions/checkout_functions.sql
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/functions/payment_functions.sql
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/functions/ticket_functions.sql
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/functions/customer_seat_hold_migration.sql
 
-## Gop y va mo rong
+# Seed data (venue, event, seat, admin account, ...)
+docker exec -i ticketing-postgres psql -U postgres -d ticketing_db < database/ticketing_seed.sql
+```
 
-Neu mo rong module moi, uu tien giu dung convention hien tai:
+### 4. Chạy API
 
-- Tao du 5 action CRUD (`insert`, `update`, `delete`, `getbyid`, `getpagedlist`)
-- Cap nhat DI tai 3 layer Application/Domain/Infrastructure
-- Kiem tra lai Swagger + JWT + DB function mapping truoc khi merge
+```bash
+# Từ thư mục gốc TicketingSystem/
+dotnet run --project TicketingSystem/TicketingSystem.csproj --environment Development
+```
+
+**API**: `http://localhost:5000`  
+**Swagger**: `http://localhost:5000/swagger`
+
+---
+
+## Tài Khoản Demo
+
+| Role | Cách lấy |
+|------|----------|
+| Admin | Xem `database/ticketing_seed.sql` → bảng `sys_user` |
+| Customer | Đăng ký qua `POST /api/client/auth/register` |
+
+---
+
+## Kiến Trúc
+
+```
+Request → Controller
+    ↓
+UseCase (Application layer)
+    ↓
+Domain Service (Business logic + Transaction)
+    ↓
+Repository (Dapper + Stored Procedures)
+    ↓
+PostgreSQL
+```
+
+| Layer | Project | Vai trò |
+|-------|---------|---------|
+| Presentation | `TicketingSystem/` | Controllers, Middleware, JWT |
+| Application | `Ticketing.Application/` | Use Cases, DTO mapping |
+| Domain | `Ticketing.Domain/` | Business rules, UnitOfWork |
+| Infrastructure | `Ticketing.Infrastructure/` | Repository, Dapper, Redis, JWT |
+
+---
+
+## API Endpoints
+
+### Admin (yêu cầu JWT)
+
+| Module | Route |
+|--------|-------|
+| Auth | `POST /api/auth/login` |
+| Event | `GET/POST/PUT/DELETE /api/admin/event` |
+| EventZone | `GET/POST/PUT/DELETE /api/admin/event-zone` |
+| EventZonePrice | `GET/POST/PUT/DELETE /api/admin/event-zone-price` |
+| Venue | `GET/POST/PUT/DELETE /api/admin/venue` |
+| VenueSection | `GET/POST/PUT/DELETE /api/admin/venue-section` |
+| VenueSeat | `GET/POST/PUT/DELETE /api/admin/venue-seat` |
+| SysUser | `GET/POST/PUT/DELETE /api/admin/sys-user` |
+| SysRole | `GET/POST/PUT/DELETE /api/admin/sys-role` |
+| SysUserRole | `GET/POST/PUT/DELETE /api/admin/sys-user-role` |
+
+### Client (public + JWT)
+
+| Module | Route |
+|--------|-------|
+| Auth | `POST /api/client/auth/register` |
+| | `POST /api/client/auth/login` |
+| Event | `GET /api/client/event/featured` |
+| | `GET /api/client/event/trending` |
+| | `GET /api/client/event/upcoming` |
+| | `GET /api/client/event/search` |
+| | `GET /api/client/event/detail` ← trả về seat map + trạng thái ghế |
+| Booking | `POST /api/client/booking/hold-seat` |
+| | `POST /api/client/booking/checkout` |
+| | `DELETE /api/client/booking/release/{holdId}` |
+| Ticket | `GET /api/client/ticket/my-tickets` |
+| | `GET /api/client/ticket/detail` |
+
+---
+
+## Tính Năng Chính
+
+- **Giữ chỗ 10 phút** — Redis lock, background job tự động trả ghế sau 60s
+- **Chống overselling** — Optimistic locking (`version`) + Redis seat-level lock
+- **Idempotency** — Ngăn double-click / retry tạo hold trùng
+- **Seat map real-time** — `detail` trả về trạng thái ghế theo từng request
+- **JWT Auth** — Admin và Customer dùng token riêng biệt
+- **Soft delete** — Mọi entity có `is_deleted`, không xóa vật lý
+
+---
+
+## Cấu Trúc Thư Mục
+
+```
+TicketingSystem/
+├── TicketingSystem.sln
+├── global.json                          # .NET SDK 8.0.x
+├── TicketingSystem/                     # Web API (entry point)
+│   ├── Controllers/Admin/
+│   ├── Controllers/Client/
+│   ├── BackgroundServices/              # SeatHoldExpiry
+│   ├── Docker/
+│   │   ├── docker-compose.yml           # PostgreSQL 16 + Redis 7
+│   │   └── Dockerfile
+│   ├── appsettings.json
+│   └── appsettings.Development.json
+├── Ticketing.Application/               # Use Cases
+├── Ticketing.Domain/                    # Domain Services
+├── Ticketing.Infrastructure/            # Repositories, Dapper, JWT, Redis
+├── database/
+│   ├── ticketing_schema.sql             # DDL toàn bộ schema
+│   ├── ticketing_seed.sql               # Seed data demo
+│   └── functions/                       # Stored procedures PostgreSQL
+└── docs/
+    ├── HUONG_DAN_CAI_DAT.md
+    ├── DATABASE.md
+    └── ARCHITECTURE.md
+```
+
+---
+
+## Công Nghệ
+
+| Công nghệ | Phiên bản | Mục đích |
+|-----------|-----------|---------|
+| ASP.NET Core | 8.0 | Web API |
+| PostgreSQL | 16 | Database chính |
+| Redis | 7 | Cache + distributed lock |
+| Dapper | 2.1.72 | Stored Procedure ORM |
+| Npgsql | 10.0.2 | PostgreSQL driver |
+| JWT Bearer | 8.0.25 | Authentication |
+| Serilog | 10.0.0 | Structured logging |
+| Swagger | 6.6.2 | API docs |
+
+---
+
+## Xử Lý Lỗi Thường Gặp
+
+| Lỗi | Cách xử lý |
+|-----|------------|
+| `Connection refused :5432` | `docker-compose up -d`, chờ status `healthy` |
+| `Connection refused :6379` | Kiểm tra container Redis |
+| `function ticketing.xxx does not exist` | Chạy lại files trong `database/functions/` |
+| Port 5000 bị chiếm | Đổi port trong `launchSettings.json` |
+
+---
+
+## Tài Liệu
+
+- [`docs/HUONG_DAN_CAI_DAT.md`](docs/HUONG_DAN_CAI_DAT.md) — Cài đặt đầy đủ từng bước
+- [`docs/DATABASE.md`](docs/DATABASE.md) — Schema, quan hệ bảng, indexes
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — Luồng xử lý chi tiết
+- [`docs/API.md`](docs/API.md) — Tài liệu API đầy đủ
