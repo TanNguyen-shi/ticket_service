@@ -35,7 +35,7 @@
 ## 💻 Source Code
 
 - [ ] 13. Dọn dẹp code (xóa `.env`, `node_modules`, `bin/obj`)
-- [ ] 14. Thêm README hướng dẫn chạy
+- [x] 14. Thêm README hướng dẫn chạy
 - [ ] 15. Copy vào thư mục `Source/`
 
 ---
