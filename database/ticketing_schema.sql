@@ -1671,40 +1671,27 @@ $$;
 CREATE FUNCTION ticketing.event_seat_inventory_update_hold(p_event_seat_inventory_id bigint, p_event_id bigint, p_seat_id bigint, p_event_zone_id bigint, p_seat_status character varying, p_current_hold_id bigint, p_base_price numeric, p_version integer) RETURNS refcursor
     LANGUAGE plpgsql
     AS $$
-/*
-    BEGIN;
-    SELECT ticketing.event_seat_inventory_update(
-        p_event_seat_inventory_id => 1,
-        p_event_id => 1,
-        p_seat_id => 101,
-        p_event_zone_id => 1,
-        p_seat_status => 'held',
-        p_current_hold_id => 10,
-        p_current_order_item_id => NULL,
-        p_base_price => 500000,
-        p_version => 2
-    );
-    FETCH ALL IN "<returned_cursor_name>";
-    COMMIT;
-*/
 DECLARE
-    v_out refcursor := 'event_seat_inventory_update_hold_' || replace(gen_random_uuid()::text, '-', '_');
+    v_out           refcursor := 'event_seat_inventory_update_hold_' || replace(gen_random_uuid()::text, '-', '_');
+    v_rows_affected int;
 BEGIN
+    -- Optimistic lock: chỉ update nếu ghế còn available VÀ version khớp
+    -- Nếu 2 request đồng thời: request thứ 2 sẽ nhận 0 rows → trả về "false" → rollback
     UPDATE ticketing.event_seat_inventory
     SET
-        event_id = p_event_id,
-        seat_id = p_seat_id,
-        event_zone_id = p_event_zone_id,
-        seat_status = p_seat_status,
+        seat_status     = p_seat_status,
         current_hold_id = p_current_hold_id,
-        base_price = p_base_price,
-        version = p_version,
-        updated_at = now()
-    WHERE event_seat_inventory_id = p_event_seat_inventory_id;
+        base_price      = p_base_price,
+        version         = version + 1,
+        updated_at      = now()
+    WHERE event_seat_inventory_id = p_event_seat_inventory_id
+      AND seat_status             = 'available'
+      AND version                 = p_version;
+
+    GET DIAGNOSTICS v_rows_affected = ROW_COUNT;
 
     OPEN v_out FOR
-    SELECT
-        p_event_seat_inventory_id AS event_seat_inventory_id;
+    SELECT (v_rows_affected > 0)::text AS success;
 
     RETURN v_out;
 END;

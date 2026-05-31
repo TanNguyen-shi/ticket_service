@@ -274,7 +274,6 @@ public class BookingUseCases(
                     throw new Exception($"Không thể tạo chi tiết đơn hàng cho ghế {item.seat_label_snapshot}");
 
                 // 8b: Cập nhật trạng thái inventory ghế từ "held" → "sold"
-                // version=1 là placeholder vì stored proc chỉ SET version chứ không dùng để WHERE (không phải true optimistic lock)
                 await seatHoldUnitOfWork.EventSeatInventoryRepository.UpdateOrderAsync(new
                 {
                     event_seat_inventory_id = item.event_seat_inventory_id,
